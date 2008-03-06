@@ -1,0 +1,150 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN"
+   "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+	<title>jQuery maphilight documentation</title>
+	<script type="text/javascript" src="jquery-1.2.3.pack.js"></script>
+	<script type="text/javascript" src="ui.tabs.pack.js"></script>
+	<link rel="stylesheet" type="text/css" href="ui.tabs.css" />
+	<style type="text/css">
+	body {
+		width: 80%;
+		margin: 0 auto;
+		line-height:1.5em;
+	}
+	body, h1, h2 {
+		font-family: "Trebuchet MS", Trebuchet, Verdana, Helvetica, Arial, sans-serif;
+	}
+	h1 {
+		margin: 1em 0 1.5em;
+		font-size: 18px;
+	}
+	h2 {
+		margin: 2em 0 1.5em;
+		font-size: 16px;
+	}
+	h3 {
+		background: #596380;
+		color: #fff;
+		margin-bottom:0.3em;
+		padding: 0.5em 0 0.5em 1em;
+		
+	}
+	p {
+		margin: 0;
+	}
+	pre, pre+p, p+p {
+		margin: 1ex 0 0;
+	}
+	pre {
+		background-color: #ddd;
+		border: 1px solid #ccc;
+		color: #000;
+		line-height: 1.1em;
+		overflow: auto;
+		padding: 5px;
+	}
+	code {
+		font-family: "Courier New", Courier, monospace;
+	}
+	.ui-tabs-nav li {
+		border: 1px solid #97A5B0;
+		border-bottom: none;
+		background: #ddecf5;
+	}
+	li.ui-tabs-selected {
+		border: 2px solid #97A5B0;
+		border-bottom: none;
+		background: #fff;
+	}
+	.options dt, .methods dt {
+		background: #CFD4E6;
+	}
+	</style>
+	<script type="text/javascript">$(function() {
+		$('.tabs').tabs();
+	});</script>
+</head>
+<body>
+	<h1>jQuery maphilight documentation</h1>
+	<p>maphilight applies to images with a 'usemap' attribute, and outlines the areas defined in their map on mouseover.</p>
+	<p>It provides a single jQuery function: <code>$.maphilight</code></p>
+	<p>This would hilight every image with a map on the page: <code>$('img[usemap]').maphilight()</code></p>
+	<h2>Demos</h2>
+	<p><a href="demo_simple.html">The simple demo</a> (with awful art)</p>
+	<p><a href="demo_world.html">The complicated demo</a> (with so many areas that it <em>will</em> have speed issues.)</p>
+	<h2>Plugin methods</h2>
+	<dl class="methods">
+		<dt><a href="#maphilight"><code>maphilight( [options] )</code>: returns jQuery</a></dt>
+		<dd>Add hilight behavior to an imagemap</dd>
+		<dt><a href="#defaults"><code>$.maphilight.defaults</code></a></dt>
+		<dd>Default settings for all maphilight calls</dd>
+	</dl>
+	<div>
+		<a name="maphilight"></a>
+		<h3><code>maphilight( [options] )</code></h3>
+		<ul class="tabs">
+			<li><a href="#overview">Overview</a></li>
+			<li><a href="#options">Options</a></li>
+		</ul>
+		<div id="overview">
+			<p>The method that adds hilight behavior to an imagemap.</p>
+			<h4>Arguments:</h4>
+			<dl>
+				<dt><code>options</code> (optional)</dt>
+				<dd>
+					<p>A set of key/value pairs that configures the map.  All options are optional.</p>
+					<p>The <a href="http://docs.jquery.com/Plugins/Metadata">metadata plugin</a> is supported, and all options can be overriden per-<code>img</code>, or per-<code>area</code>.</p>
+					<p>Example: to make one particular hilight green:</p>
+					<pre><code>&lt;area ... class="{fillColor:'00ff00'}"></code></pre>
+				</dd>
+			</dl>
+		</div>
+		<div id="options">
+			<h4>Options:</h4>
+			<dl class="options">
+				<dt><code>fill</code> (Boolean. Default: true)</dt>
+				<dd>Whether to fill the shape</dd>
+				<dt><code>fillColor</code> (String. Default: '000000')</dt>
+				<dd>The color to fill the shape with</dd>
+				<dt><code>fillOpacity</code> (Number. Default: 0.2)</dt>
+				<dd>The opacity of the fill (0 = fully transparent, 1 = fully opaque)</dd>
+				<dt><code>stroke</code> (Boolean. Default: true)</dt>
+				<dd>Whether to outline the shape</dd>
+				<dt><code>strokeColor</code> (String. Default: 'ff0000')</dt>
+				<dd>The color of the outline</dd>
+				<dt><code>strokeOpacity</code> (Number. Default: 1)</dt>
+				<dd>The opacity of the outline (0 = fully transparent, 1 = fully opaque)</dd>
+				<dt><code>strokeWidth</code> (Number. Default: 1)</dt>
+				<dd>The thickness of the outline</dd>
+				<dt><code>fade</code> (Boolean. Default: true)</dt>
+				<dd>Whether to fade in the shapes on mouseover</dd>
+			</dl>
+		</div>
+	</div>
+	<div>
+		<a name="defaults"></a>
+		<h3><code>$.maphilight.defaults</code></h3>
+		<p>The defaults for all uses of maphilight can be set here.  If you manually replace this, you <em>have</em> to specify all options.</p>
+		<pre><code>$.fn.maphilight.defaults = {
+	fill: true,
+	fillColor: '000000',
+	fillOpacity: 0.2,
+	stroke: true,
+	strokeColor: 'ff0000',
+	strokeOpacity: 1,
+	strokeWidth: 1,
+	fade: true
+}</code></pre>
+	</div>
+	<h2>Changelog</h2>
+	<ul>
+		<li>1.0: First release.</li>
+	</ul>
+	<h2>Tested with</h2>
+	<ul>
+		<li>Firefox 3</li>
+		<li>IE 6</li>
+	</ul>
+</body>
+</html>
