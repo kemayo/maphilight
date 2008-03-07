@@ -1,11 +1,10 @@
 (function($) {
-	
 	var has_VML = document.namespaces;
 	var has_canvas = document.createElement('canvas');
 	var has_canvas = has_canvas && has_canvas.getContext;
 	
 	if(!(has_canvas || has_VML)) {
-		$.fn.maphilight = function() {};
+		$.fn.maphilight = function() { return this; };
 		return;
 	}
 	
@@ -90,7 +89,7 @@
 		return [area.getAttribute('shape').toLowerCase().substr(0,4), coords];
 	}
 	
-	var canvas_attributes = {
+	var canvas_style = {
 		position: 'absolute',
 		left: 0,
 		top: 0,
@@ -105,17 +104,16 @@
 			var map = $('map[name="'+img.attr('usemap').substr(1)+'"]');
 			if(!(img.is('img') && img.attr('usemap') && map.size() > 0 && !img.hasClass('maphilighted'))) { return; }
 			img.wrap($('<div style="background:url('+this.src+');position: relative; padding: 0; width: '+this.width+'px; height: '+this.height+'px"></div>'));
-			img.css('opacity', 0).css('border', 0)
+			img.css('opacity', 0).css('border', 0).css(canvas_style);
 			
 			var canvas = create_canvas_for(this);
-			$(canvas).css(canvas_attributes);
+			$(canvas).css(canvas_style);
 			canvas.height = this.height;
 			canvas.width = this.width;
 			
 			if($.browser.msie) {
 				// Moving the canvas "down" so the mouseover functions will reach the <area>s in IE.  (IE-only because this does the exact opposite in Firefox.)
 				img.css('filter', 'Alpha(opacity=0)');
-				$(canvas).css('z-index', '-1');
 			}
 			
 			$(map).find('area[coords]')
@@ -124,7 +122,10 @@
 					add_shape_to(canvas, shape[0], shape[1], ($.metadata ? $.extend({}, options, $(this).metadata()) : options));
 				}).mouseout(function(e) {
 					clear_canvas(canvas);
-				});
+				})/*.each(function() {
+					var shape = shape_from_area(this);
+					add_shape_to(canvas, shape[0], shape[1], ($.metadata ? $.extend({}, options, $(this).metadata()) : options));
+				});*/
 			
 			img.before(canvas); // if we put this after, the mouseover events wouldn't fire.
 			img.addClass('maphilighted');
