@@ -11,9 +11,9 @@
 	var create_canvas_for, add_shape_to, clear_canvas;
 	if(has_canvas) {
 		var fader = function(element, opacity, interval) {
-			if(opacity <= 100) {
-				element.style.opacity = opacity/100;
-				window.setTimeout(fader, 10, element, opacity + 10, 10);
+			if(opacity <= 1) {
+				element.style.opacity = opacity;
+				window.setTimeout(fader, 10, element, opacity + 0.1, 10);
 			}
 		}
 		
@@ -105,27 +105,25 @@
 			if(!(img.is('img') && img.attr('usemap') && map.size() > 0 && !img.hasClass('maphilighted'))) { return; }
 			img.wrap($('<div style="background:url('+this.src+');position: relative; padding: 0; width: '+this.width+'px; height: '+this.height+'px"></div>'));
 			img.css('opacity', 0).css('border', 0).css(canvas_style);
+			if($.browser.msie) { img.css('filter', 'Alpha(opacity=0)'); }
 			
 			var canvas = create_canvas_for(this);
 			$(canvas).css(canvas_style);
 			canvas.height = this.height;
 			canvas.width = this.width;
 			
-			if($.browser.msie) {
-				// Moving the canvas "down" so the mouseover functions will reach the <area>s in IE.  (IE-only because this does the exact opposite in Firefox.)
-				img.css('filter', 'Alpha(opacity=0)');
+			var mouseover = function(e) {
+				var shape = shape_from_area(this);
+				add_shape_to(canvas, shape[0], shape[1], $.metadata ? $.extend({}, options, $(this).metadata()) : options);
 			}
 			
-			$(map).find('area[coords]')
-				.mouseover(function(e) {
-					var shape = shape_from_area(this);
-					add_shape_to(canvas, shape[0], shape[1], ($.metadata ? $.extend({}, options, $(this).metadata()) : options));
-				}).mouseout(function(e) {
-					clear_canvas(canvas);
-				})/*.each(function() {
-					var shape = shape_from_area(this);
-					add_shape_to(canvas, shape[0], shape[1], ($.metadata ? $.extend({}, options, $(this).metadata()) : options));
-				});*/
+			if(options.alwaysOn) {
+				var areas = $(map).find('area[coords]').each(mouseover);
+			} else {
+				$(map).find('area[coords]')
+					.mouseover(mouseover)
+					.mouseout(function(e) { clear_canvas(canvas); });
+			}
 			
 			img.before(canvas); // if we put this after, the mouseover events wouldn't fire.
 			img.addClass('maphilighted');
@@ -139,6 +137,7 @@
 		strokeColor: 'ff0000',
 		strokeOpacity: 1,
 		strokeWidth: 1,
-		fade: true
+		fade: true,
+		alwaysOn: false
 	}
 })(jQuery);
