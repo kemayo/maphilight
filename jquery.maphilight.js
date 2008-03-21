@@ -1,7 +1,7 @@
 (function($) {
 	var has_VML = document.namespaces;
 	var has_canvas = document.createElement('canvas');
-	var has_canvas = has_canvas && has_canvas.getContext;
+	has_canvas = has_canvas && has_canvas.getContext;
 	
 	if(!(has_canvas || has_VML)) {
 		$.fn.maphilight = function() { return this; };
@@ -15,19 +15,19 @@
 				element.style.opacity = opacity;
 				window.setTimeout(fader, 10, element, opacity + 0.1, 10);
 			}
-		}
+		};
 		
 		var hex_to_decimal = function(hex) {
 			return Math.max(0, Math.min(parseInt(hex, 16), 255));
-		}
+		};
 		var css3color = function(color, opacity) {
 			return 'rgba('+hex_to_decimal(color.substr(0,2))+','+hex_to_decimal(color.substr(2,2))+','+hex_to_decimal(color.substr(4,2))+','+opacity+')';
-		}
+		};
 		create_canvas_for = function(img) {
 			var c = $('<canvas style="width:'+img.width+'px;height:'+img.height+'px;"></canvas>').get(0);
 			c.getContext("2d").clearRect(0, 0, c.width, c.height);
 			return c;
-		}
+		};
 		add_shape_to = function(canvas, shape, coords, options) {
 			var context = canvas.getContext('2d');
 			context.beginPath();
@@ -35,7 +35,7 @@
 				context.rect(coords[0], coords[1], coords[2] - coords[0], coords[3] - coords[1]);
 			} else if(shape == 'poly') {
 				context.moveTo(coords[0], coords[1]);
-				for(i=2; i < coords.length; i+=2) {
+				for(var i=2; i < coords.length; i+=2) {
 					context.lineTo(coords[i], coords[i+1]);
 				}
 			} else if(shape == 'circ') {
@@ -54,10 +54,10 @@
 			if(options.fade) {
 				fader(canvas, 0);
 			}
-		}
-		var clear_canvas = function(canvas, area) {
+		};
+		clear_canvas = function(canvas, area) {
 			canvas.getContext('2d').clearRect(0, 0, canvas.width,canvas.height);
-		}
+		};
 	} else {
 		var stylesheet = document.createStyleSheet();
 		stylesheet.addRule("v\\:*", "behavior: url(#default#VML); antialias: true;"); 
@@ -78,23 +78,23 @@
 			} else if(shape == 'circ') {
 				canvas.innerHTML = '<v:oval filled="t" '+stroke+' style="zoom:1;margin:0;padding:0;display:block;position:absolute;left:'+(coords[0] - coords[2])+'px;top:'+(coords[1] - coords[2])+'px;width:'+(coords[2]*2)+'px;height:'+(coords[2]*2)+'px;">'+fill+opacity+'</v:oval>';
 			}
-		}
+		};
 		clear_canvas = function(canvas) {
 			canvas.innerHTML = '';
-		}
+		};
 	}
 	var shape_from_area = function(area) {
 		var coords = area.getAttribute('coords').split(',');
-		for (i=0; i < coords.length; i++) { coords[i] = parseFloat(coords[i]); }
+		for (var i=0; i < coords.length; i++) { coords[i] = parseFloat(coords[i]); }
 		return [area.getAttribute('shape').toLowerCase().substr(0,4), coords];
-	}
+	};
 	
 	var canvas_style = {
 		position: 'absolute',
 		left: 0,
 		top: 0,
 		padding: 0
-	}
+	};
 	
 	$.fn.maphilight = function(opts) {
 		opts = $.extend({}, $.fn.maphilight.defaults, opts);
@@ -115,20 +115,18 @@
 			var mouseover = function(e) {
 				var shape = shape_from_area(this);
 				add_shape_to(canvas, shape[0], shape[1], $.metadata ? $.extend({}, options, $(this).metadata()) : options);
-			}
+			};
 			
 			if(options.alwaysOn) {
 				var areas = $(map).find('area[coords]').each(mouseover);
 			} else {
-				$(map).find('area[coords]')
-					.mouseover(mouseover)
-					.mouseout(function(e) { clear_canvas(canvas); });
+				$(map).find('area[coords]').mouseover(mouseover).mouseout(function(e) { clear_canvas(canvas); });
 			}
 			
 			img.before(canvas); // if we put this after, the mouseover events wouldn't fire.
 			img.addClass('maphilighted');
 		});
-	}
+	};
 	$.fn.maphilight.defaults = {
 		fill: true,
 		fillColor: '000000',
@@ -139,5 +137,5 @@
 		strokeWidth: 1,
 		fade: true,
 		alwaysOn: false
-	}
+	};
 })(jQuery);
