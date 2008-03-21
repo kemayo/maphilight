@@ -104,7 +104,7 @@
 			options = $.metadata ? $.extend({}, opts, img.metadata()) : opts;
 			map = $('map[name="'+img.attr('usemap').substr(1)+'"]');
 			if(!(img.is('img') && img.attr('usemap') && map.size() > 0 && !img.hasClass('maphilighted'))) { return; }
-			img.wrap($('<span style="display:block;background:url('+this.src+');position:relative;padding:0;width:'+this.width+'px;height:'+this.height+'px"></div>'));
+			img.wrap($('<span>').css({display:'block',background:'url('+this.src+')',position:'relative',padding:0,width:this.width,height:this.height}));
 			img.css('opacity', 0).css('border', 0).css(canvas_style);
 			if($.browser.msie) { img.css('filter', 'Alpha(opacity=0)'); }
 			
