@@ -6,7 +6,7 @@
 	<script type="text/javascript" src="jquery-1.2.3.pack.js"></script>
 	<script type="text/javascript" src="../jquery.maphilight.js"></script>
 	<script>$(function() {
-		$('.map').maphilight();
+		$('.map').load(function() { $(this).maphilight(); });
 	});</script>
 </head>
 <body>

@@ -7,7 +7,7 @@
 	<script type="text/javascript" src="jquery.metadata.min.js"></script>
 	<script type="text/javascript" src="../jquery.maphilight.js"></script>
 	<script>$(function() {
-		$('.map').maphilight();
+		$('.map').load(function() { $(this).maphilight(); });
 	});</script>
 </head>
 <body>
