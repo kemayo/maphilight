@@ -1,6 +1,6 @@
 (function($) {
 	var has_VML, create_canvas_for, add_shape_to, clear_canvas, shape_from_area,
-		canvas_style, fader, hex_to_decimal, css3color;
+		canvas_style, fader, hex_to_decimal, css3color, is_image_loaded;
 	has_VML = document.namespaces;
 	has_canvas = document.createElement('canvas');
 	has_canvas = has_canvas && has_canvas.getContext;
@@ -67,20 +67,22 @@
 			return $('<var style="zoom:1;overflow:hidden;display:block;width:'+img.width+'px;height:'+img.height+'px;"></var>').get(0);
 		};
 		add_shape_to = function(canvas, shape, coords, options) {
-			var fill, stroke, opacity;
+			var fill, stroke, opacity, e;
 			fill = '<v:fill color="#'+options.fillColor+'" opacity="'+(options.fill ? options.fillOpacity : 0)+'" />';
 			stroke = (options.stroke ? 'strokeweight="'+options.strokeWidth+'" stroked="t" strokecolor="#'+options.strokeColor+'"' : 'stroked="f"');
 			opacity = '<v:stroke opacity="'+options.strokeOpacity+'"/>';
 			if(shape == 'rect') {
-				canvas.innerHTML = '<v:rect filled="t" '+stroke+' style="zoom:1;margin:0;padding:0;display:block;position:absolute;left:'+coords[0]+'px;top:'+coords[1]+'px;width:'+(coords[2] - coords[0])+'px;height:'+(coords[3] - coords[1])+'px;">'+fill+opacity+'</v:rect>';
+				e = $('<v:rect filled="t" '+stroke+' style="zoom:1;margin:0;padding:0;display:block;position:absolute;left:'+coords[0]+'px;top:'+coords[1]+'px;width:'+(coords[2] - coords[0])+'px;height:'+(coords[3] - coords[1])+'px;"></v:rect>');
 			} else if(shape == 'poly') {
-				canvas.innerHTML = '<v:shape filled="t" '+stroke+' coordorigin="0,0" coordsize="'+canvas.width+','+canvas.height+'" path="m '+coords[0]+','+coords[1]+' l '+coords.join(',')+' x e" style="zoom:1;margin:0;padding:0;display:block;position:absolute;top:0px;left:0px;width:'+canvas.width+'px;height:'+canvas.height+'px;">'+fill+opacity+'</v:shape>'; 
+				e = $('<v:shape filled="t" '+stroke+' coordorigin="0,0" coordsize="'+canvas.width+','+canvas.height+'" path="m '+coords[0]+','+coords[1]+' l '+coords.join(',')+' x e" style="zoom:1;margin:0;padding:0;display:block;position:absolute;top:0px;left:0px;width:'+canvas.width+'px;height:'+canvas.height+'px;"></v:shape>');
 			} else if(shape == 'circ') {
-				canvas.innerHTML = '<v:oval filled="t" '+stroke+' style="zoom:1;margin:0;padding:0;display:block;position:absolute;left:'+(coords[0] - coords[2])+'px;top:'+(coords[1] - coords[2])+'px;width:'+(coords[2]*2)+'px;height:'+(coords[2]*2)+'px;">'+fill+opacity+'</v:oval>';
+				e = $('<v:oval filled="t" '+stroke+' style="zoom:1;margin:0;padding:0;display:block;position:absolute;left:'+(coords[0] - coords[2])+'px;top:'+(coords[1] - coords[2])+'px;width:'+(coords[2]*2)+'px;height:'+(coords[2]*2)+'px;"></v:oval>');
 			}
+			e.get(0).innerHTML = fill+opacity;
+			$(canvas).append(e);
 		};
 		clear_canvas = function(canvas) {
-			canvas.innerHTML = '';
+			$(canvas).empty();
 		};
 	}
 	shape_from_area = function(area) {
@@ -89,24 +91,33 @@
 		return [area.getAttribute('shape').toLowerCase().substr(0,4), coords];
 	};
 	
+	is_image_loaded = function(img) {
+		if(!img.complete) { return false; } // IE
+		if(typeof img.naturalWidth != "undefined" && img.naturalWidth == 0) { return false; } // Others
+		return true;
+	}
+
 	canvas_style = {
 		position: 'absolute',
 		left: 0,
 		top: 0,
-		padding: 0
+		padding: 0,
+		border: 0
 	};
 	
 	$.fn.maphilight = function(opts) {
 		opts = $.extend({}, $.fn.maphilight.defaults, opts);
 		return this.each(function() {
-			var img, options, map, canvas, mouseover;
+			var img, wrap, options, map, canvas, mouseover;
 			img = $(this);
+			if(!is_image_loaded(this)) { return window.setTimeout(function() { img.maphilight(); }, 200); }
 			options = $.metadata ? $.extend({}, opts, img.metadata()) : opts;
 			map = $('map[name="'+img.attr('usemap').substr(1)+'"]');
 			if(!(img.is('img') && img.attr('usemap') && map.size() > 0 && !img.hasClass('maphilighted'))) { return; }
-			img.wrap($('<span>').css({display:'block',background:'url('+this.src+')',position:'relative',padding:0,width:this.width,height:this.height}));
-			img.css('opacity', 0).css('border', 0).css(canvas_style);
+			wrap = $('<div>').css({display:'block',background:'url('+this.src+')',position:'relative',padding:0,width:this.width,height:this.height});
+			img.before(wrap).css('opacity', 0).css(canvas_style).remove();
 			if($.browser.msie) { img.css('filter', 'Alpha(opacity=0)'); }
+			wrap.append(img);
 			
 			canvas = create_canvas_for(this);
 			$(canvas).css(canvas_style);
