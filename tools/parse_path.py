@@ -99,6 +99,7 @@ coordinatePairTripleSequence = Sequence(Group(coordinatePairTriple))
 
 #commands
 lineTo = Group(Command("L") + Arguments(coordinatePairSequence))
+curve = Group(Command("C") + Arguments(coordinatePairSequence))
 
 moveTo = Group(Command("M") + Arguments(coordinatePairSequence))
 
@@ -120,7 +121,6 @@ ellipticalArcArgument = Group(
     coordinatePair #(x,y)
 )
 
- 
 ellipticalArc = Group(Command("A") + Arguments(Sequence(ellipticalArcArgument)))
 
 smoothQuadraticBezierCurveto = Group(Command("T") + Arguments(coordinatePairSequence))
@@ -129,7 +129,7 @@ quadraticBezierCurveto = Group(Command("Q") + Arguments(coordinatePairPairSequen
 
 smoothCurve = Group(Command("S") + Arguments(coordinatePairPairSequence))
 
-curve = Group(Command("C") + Arguments(coordinatePairTripleSequence))
+#curve = Group(Command("C") + Arguments(coordinatePairTripleSequence))
 
 horizontalLine = Group(Command("H") + Arguments(coordinateSequence))
 verticalLine = Group(Command("V") + Arguments(coordinateSequence))
@@ -155,6 +155,8 @@ def get_points(d):
             points.append(currentset)
             currentset.append(command[1][-1])
         elif command[0] == 'L':
+            currentset.extend(command[1])
+        elif command[0] == 'C':
             currentset.extend(command[1])
     return points
 

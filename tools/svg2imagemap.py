@@ -46,30 +46,39 @@ if len(sys.argv) >= 3:
 svg_file = xml.dom.minidom.parse(sys.argv[1])
 svg = svg_file.getElementsByTagName('svg')[0]
 
-width_ratio = x and (x / float(svg.getAttribute('width'))) or 1
-height_ratio = x and (x / float(svg.getAttribute('height'))) or 1
+raw_width = float(svg.getAttribute('width'))
+raw_height = float(svg.getAttribute('height'))
+width_ratio = x and (x / raw_width) or 1
+height_ratio = y and (y / raw_height) or 1
 
 if groups:
     elements = [g for g in svg.getElementsByTagName('g') if (g.hasAttribute('id') and g.getAttribute('id') in groups)]
+    elements.extend([p for p in svg.getElementsByTagName('path') if (p.hasAttribute('id') and p.getAttribute('id') in groups)])
 else:
     elements = svg.getElementsByTagName('g')
 
 parsed_groups = {}
-for g in elements:
+for e in elements:
     paths = []
-    for path in g.getElementsByTagName('path'):
-        points = parse_path.get_points(path.getAttribute('d'))
+    if e.nodeName == 'g':
+        for path in e.getElementsByTagName('path'):
+            points = parse_path.get_points(path.getAttribute('d'))
+            for pointset in points:
+                paths.append([path.getAttribute('id'), pointset])
+    else:
+        points = parse_path.get_points(e.getAttribute('d'))
         for pointset in points:
-            paths.append([path.getAttribute('id'), pointset])
-    if g.hasAttribute('transform'):
-        for transform in re.findall(r'(\w+)\((-?\d+.?\d*),(-?\d+.?\d*)\)', g.getAttribute('transform')):
+            paths.append([e.getAttribute('id'), pointset])
+    if e.hasAttribute('transform'):
+        print e.getAttribute('id'), e.getAttribute('transform')
+        for transform in re.findall(r'(\w+)\((-?\d+.?\d*),(-?\d+.?\d*)\)', e.getAttribute('transform')):
             if transform[0] == 'translate':
                 x_shift = float(transform[1])
                 y_shift = float(transform[2])
                 for path in paths:
                     path[1] = [(p[0] + x_shift, p[1] + y_shift) for p in path[1]]
     
-    parsed_groups[g.getAttribute('id')] = paths
+    parsed_groups[e.getAttribute('id')] = paths
 
 out = []
 for g in parsed_groups:
