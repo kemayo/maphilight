@@ -110,7 +110,7 @@
 		return this.each(function() {
 			var img, wrap, options, map, canvas, mouseover;
 			img = $(this);
-			if(!is_image_loaded(this)) { return window.setTimeout(function() { img.maphilight(); }, 200); }
+			if(!is_image_loaded(this)) { return window.setTimeout(function() { img.maphilight(opts); }, 200); }
 			options = $.metadata ? $.extend({}, opts, img.metadata()) : opts;
 			map = $('map[name="'+img.attr('usemap').substr(1)+'"]');
 			if(!(img.is('img') && img.attr('usemap') && map.size() > 0 && !img.hasClass('maphilighted'))) { return; }
