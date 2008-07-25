@@ -108,7 +108,7 @@
 	$.fn.maphilight = function(opts) {
 		opts = $.extend({}, $.fn.maphilight.defaults, opts);
 		return this.each(function() {
-			var img, wrap, options, map, canvas, mouseover;
+			var img, wrap, options, map, canvas, canvas_always, mouseover;
 			img = $(this);
 			if(!is_image_loaded(this)) { return window.setTimeout(function() { img.maphilight(opts); }, 200); }
 			options = $.metadata ? $.extend({}, opts, img.metadata()) : opts;
@@ -125,13 +125,36 @@
 			canvas.width = this.width;
 			
 			mouseover = function(e) {
-				var shape = shape_from_area(this);
-				add_shape_to(canvas, shape[0], shape[1], $.metadata ? $.extend({}, options, $(this).metadata()) : options);
+				var shape, area_options;
+				area_options = $.metadata ? $.extend({}, options, $(this).metadata()) : options;
+				if(!area_options.alwaysOn) {
+					shape = shape_from_area(this);
+					add_shape_to(canvas, shape[0], shape[1], area_options);
+				}
 			};
 			
 			if(options.alwaysOn) {
 				$(map).find('area[coords]').each(mouseover);
 			} else {
+				if($.metadata) {
+					// If the metadata plugin is present, there may be areas with alwaysOn set.
+					// We'll add these to a *second* canvas, which will get around flickering during fading.
+					$(map).find('area[coords]').each(function() {
+						var shape, area_options;
+						area_options = $.metadata ? $.extend({}, options, $(this).metadata()) : options;
+						if(area_options.alwaysOn) {
+							if(!canvas_always) {
+								canvas_always = create_canvas_for(img.get());
+								$(canvas_always).css(canvas_style);
+								canvas_always.width = img.width();
+								canvas_always.height = img.height();
+								img.before(canvas_always);
+							}
+							shape = shape_from_area(this);
+							add_shape_to(canvas_always, shape[0], shape[1], area_options);
+						}
+					})
+				}
 				$(map).find('area[coords]').mouseover(mouseover).mouseout(function(e) { clear_canvas(canvas); });
 			}
 			
