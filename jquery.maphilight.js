@@ -113,10 +113,27 @@
 			var img, wrap, options, map, canvas, canvas_always, mouseover, highlighted_shape;
 			img = $(this);
 		
-			if(!is_image_loaded(this)) { return window.setTimeout(function() { img.maphilight(opts); }, 200); }
+			if(!is_image_loaded(this)) {
+				// If the image isn't fully loaded, this won't work right.  Try again later.
+				return window.setTimeout(function() {
+					img.maphilight(opts);
+				}, 200);
+			}
+
 			options = $.metadata ? $.extend({}, opts, img.metadata()) : opts;
+
 			map = $('map[name="'+img.attr('usemap').substr(1)+'"]');
-			if(!(img.is('img') && img.attr('usemap') && map.size() > 0 && !img.hasClass('maphilighted'))) { return; }
+
+			if(!(img.is('img') && img.attr('usemap') && map.size() > 0)) { return; }
+
+			if(img.hasClass('maphilighted')) {
+				// We're redrawing an old map, probably to pick up changes to the options.
+				// Just clear out all the old stuff.
+				var wrapper = img.parent();
+				img.insertBefore(wrapper);
+				wrapper.remove();
+			}
+
 			wrap = $('<div>').css({display:'block',background:'url('+this.src+')',position:'relative',padding:0,width:this.width,height:this.height});
 			img.before(wrap).css('opacity', 0).css(canvas_style).remove();
 			if($.browser.msie) { img.css('filter', 'Alpha(opacity=0)'); }
@@ -135,7 +152,6 @@
 					add_shape_to(canvas, shape[0], shape[1], area_options, "highlighted");
 				}
 			}
-	
 			
 			if(options.alwaysOn) {
 				$(map).find('area[coords]').each(mouseover);
