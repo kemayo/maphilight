@@ -1,10 +1,11 @@
 (function($) {
 	var has_VML, create_canvas_for, add_shape_to, clear_canvas, shape_from_area,
 		canvas_style, fader, hex_to_decimal, css3color, is_image_loaded;
+
 	has_VML = document.namespaces;
 	has_canvas = document.createElement('canvas');
 	has_canvas = has_canvas && has_canvas.getContext;
-	
+
 	if(!(has_canvas || has_VML)) {
 		$.fn.maphilight = function() { return this; };
 		return;
@@ -29,7 +30,7 @@
 			c.getContext("2d").clearRect(0, 0, c.width, c.height);
 			return c;
 		};
-		add_shape_to = function(canvas, shape, coords, options) {
+		add_shape_to = function(canvas, shape, coords, options, name) {
 			var i, context = canvas.getContext('2d');
 			context.beginPath();
 			if(shape == 'rect') {
@@ -59,32 +60,33 @@
 		clear_canvas = function(canvas, area) {
 			canvas.getContext('2d').clearRect(0, 0, canvas.width,canvas.height);
 		};
-	} else {
+	} else {   // ie executes this code
 		document.createStyleSheet().addRule("v\\:*", "behavior: url(#default#VML); antialias: true;"); 
 		document.namespaces.add("v", "urn:schemas-microsoft-com:vml"); 
 		
 		create_canvas_for = function(img) {
 			return $('<var style="zoom:1;overflow:hidden;display:block;width:'+img.width+'px;height:'+img.height+'px;"></var>').get(0);
 		};
-		add_shape_to = function(canvas, shape, coords, options) {
+		add_shape_to = function(canvas, shape, coords, options, name) {
 			var fill, stroke, opacity, e;
 			fill = '<v:fill color="#'+options.fillColor+'" opacity="'+(options.fill ? options.fillOpacity : 0)+'" />';
 			stroke = (options.stroke ? 'strokeweight="'+options.strokeWidth+'" stroked="t" strokecolor="#'+options.strokeColor+'"' : 'stroked="f"');
 			opacity = '<v:stroke opacity="'+options.strokeOpacity+'"/>';
 			if(shape == 'rect') {
-				e = $('<v:rect filled="t" '+stroke+' style="zoom:1;margin:0;padding:0;display:block;position:absolute;left:'+coords[0]+'px;top:'+coords[1]+'px;width:'+(coords[2] - coords[0])+'px;height:'+(coords[3] - coords[1])+'px;"></v:rect>');
+				e = $('<v:rect name="'+name+'" filled="t" '+stroke+' style="zoom:1;margin:0;padding:0;display:block;position:absolute;left:'+coords[0]+'px;top:'+coords[1]+'px;width:'+(coords[2] - coords[0])+'px;height:'+(coords[3] - coords[1])+'px;"></v:rect>');
 			} else if(shape == 'poly') {
-				e = $('<v:shape filled="t" '+stroke+' coordorigin="0,0" coordsize="'+canvas.width+','+canvas.height+'" path="m '+coords[0]+','+coords[1]+' l '+coords.join(',')+' x e" style="zoom:1;margin:0;padding:0;display:block;position:absolute;top:0px;left:0px;width:'+canvas.width+'px;height:'+canvas.height+'px;"></v:shape>');
+				e = $('<v:shape name="'+name+'" filled="t" '+stroke+' coordorigin="0,0" coordsize="'+canvas.width+','+canvas.height+'" path="m '+coords[0]+','+coords[1]+' l '+coords.join(',')+' x e" style="zoom:1;margin:0;padding:0;display:block;position:absolute;top:0px;left:0px;width:'+canvas.width+'px;height:'+canvas.height+'px;"></v:shape>');
 			} else if(shape == 'circ') {
-				e = $('<v:oval filled="t" '+stroke+' style="zoom:1;margin:0;padding:0;display:block;position:absolute;left:'+(coords[0] - coords[2])+'px;top:'+(coords[1] - coords[2])+'px;width:'+(coords[2]*2)+'px;height:'+(coords[2]*2)+'px;"></v:oval>');
+				e = $('<v:oval name="'+name+'" filled="t" '+stroke+' style="zoom:1;margin:0;padding:0;display:block;position:absolute;left:'+(coords[0] - coords[2])+'px;top:'+(coords[1] - coords[2])+'px;width:'+(coords[2]*2)+'px;height:'+(coords[2]*2)+'px;"></v:oval>');
 			}
 			e.get(0).innerHTML = fill+opacity;
 			$(canvas).append(e);
 		};
 		clear_canvas = function(canvas) {
-			$(canvas).empty();
+			$(canvas).find('[name=highlighted]').remove();
 		};
 	}
+	
 	shape_from_area = function(area) {
 		var i, coords = area.getAttribute('coords').split(',');
 		for (i=0; i < coords.length; i++) { coords[i] = parseFloat(coords[i]); }
@@ -108,8 +110,9 @@
 	$.fn.maphilight = function(opts) {
 		opts = $.extend({}, $.fn.maphilight.defaults, opts);
 		return this.each(function() {
-			var img, wrap, options, map, canvas, canvas_always, mouseover;
+			var img, wrap, options, map, canvas, canvas_always, mouseover, highlighted_shape;
 			img = $(this);
+		
 			if(!is_image_loaded(this)) { return window.setTimeout(function() { img.maphilight(opts); }, 200); }
 			options = $.metadata ? $.extend({}, opts, img.metadata()) : opts;
 			map = $('map[name="'+img.attr('usemap').substr(1)+'"]');
@@ -129,9 +132,10 @@
 				area_options = $.metadata ? $.extend({}, options, $(this).metadata()) : options;
 				if(!area_options.alwaysOn) {
 					shape = shape_from_area(this);
-					add_shape_to(canvas, shape[0], shape[1], area_options);
+					add_shape_to(canvas, shape[0], shape[1], area_options, "highlighted");
 				}
-			};
+			}
+	
 			
 			if(options.alwaysOn) {
 				$(map).find('area[coords]').each(mouseover);
@@ -151,14 +155,19 @@
 								img.before(canvas_always);
 							}
 							shape = shape_from_area(this);
-							add_shape_to(canvas_always, shape[0], shape[1], area_options);
+							if ($.browser.msie) {
+								add_shape_to(canvas, shape[0], shape[1], area_options, "");
+							} else {
+								add_shape_to(canvas_always, shape[0], shape[1], area_options, "");
+							}
 						}
-					})
+					});
 				}
 				$(map).find('area[coords]').mouseover(mouseover).mouseout(function(e) { clear_canvas(canvas); });
 			}
 			
 			img.before(canvas); // if we put this after, the mouseover events wouldn't fire.
+			
 			img.addClass('maphilighted');
 		});
 	};
