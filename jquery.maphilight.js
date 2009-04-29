@@ -61,11 +61,6 @@
 			canvas.getContext('2d').clearRect(0, 0, canvas.width,canvas.height);
 		};
 	} else {   // ie executes this code
-		if($.browser.msie) {
-			document.createStyleSheet().addRule("v\\:*", "behavior: url(#default#VML); antialias: true;");
-			document.namespaces.add("v", "urn:schemas-microsoft-com:vml");
-		}
-		
 		create_canvas_for = function(img) {
 			return $('<var style="zoom:1;overflow:hidden;display:block;width:'+img.width+'px;height:'+img.height+'px;"></var>').get(0);
 		};
@@ -109,8 +104,16 @@
 		border: 0
 	};
 	
+	var ie_hax_done = false;
 	$.fn.maphilight = function(opts) {
 		opts = $.extend({}, $.fn.maphilight.defaults, opts);
+		
+		if($.browser.msie && !ie_hax_done) {
+			document.createStyleSheet().addRule("v\\:*", "behavior: url(#default#VML); antialias: true;");
+			document.namespaces.add("v", "urn:schemas-microsoft-com:vml");
+			ie_hax_done = true;
+		}
+		
 		return this.each(function() {
 			var img, wrap, options, map, canvas, canvas_always, mouseover, highlighted_shape;
 			img = $(this);
