@@ -61,8 +61,10 @@
 			canvas.getContext('2d').clearRect(0, 0, canvas.width,canvas.height);
 		};
 	} else {   // ie executes this code
-		document.createStyleSheet().addRule("v\\:*", "behavior: url(#default#VML); antialias: true;"); 
-		document.namespaces.add("v", "urn:schemas-microsoft-com:vml"); 
+		if($.browser.msie) {
+			document.createStyleSheet().addRule("v\\:*", "behavior: url(#default#VML); antialias: true;");
+			document.namespaces.add("v", "urn:schemas-microsoft-com:vml");
+		}
 		
 		create_canvas_for = function(img) {
 			return $('<var style="zoom:1;overflow:hidden;display:block;width:'+img.width+'px;height:'+img.height+'px;"></var>').get(0);
