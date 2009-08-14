@@ -109,8 +109,14 @@
 		opts = $.extend({}, $.fn.maphilight.defaults, opts);
 		
 		if($.browser.msie && !ie_hax_done) {
-			document.createStyleSheet().addRule("v\\:*", "behavior: url(#default#VML); antialias: true;");
 			document.namespaces.add("v", "urn:schemas-microsoft-com:vml");
+			var style = document.createStyleSheet();
+			var shapes = ['shape','rect', 'oval', 'circ', 'fill', 'stroke', 'imagedata', 'group','textbox'];
+			$.each(shapes,
+				function() {
+					style.addRule('v\\:' + this, "behavior: url(#default#VML); antialias:true");
+				}
+			);
 			ie_hax_done = true;
 		}
 		
