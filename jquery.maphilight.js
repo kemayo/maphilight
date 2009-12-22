@@ -158,7 +158,7 @@
 			mouseover = function(e) {
 				var shape, area_options;
 				area_options = $.metadata ? $.extend({}, options, $(this).metadata()) : options;
-				if(!area_options.alwaysOn) {
+				if(!area_options.neverOn && !area_options.alwaysOn) {
 					shape = shape_from_area(this);
 					add_shape_to(canvas, shape[0], shape[1], area_options, "highlighted");
 				}
