@@ -214,6 +214,7 @@
 		strokeOpacity: 1,
 		strokeWidth: 1,
 		fade: true,
-		alwaysOn: false
+		alwaysOn: false,
+		neverOn: false
 	};
 })(jQuery);
