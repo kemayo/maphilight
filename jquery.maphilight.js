@@ -123,7 +123,7 @@
 		return this.each(function() {
 			var img, wrap, options, map, canvas, canvas_always, mouseover, highlighted_shape;
 			img = $(this);
-		
+
 			if(!is_image_loaded(this)) {
 				// If the image isn't fully loaded, this won't work right.  Try again later.
 				return window.setTimeout(function() {
@@ -158,7 +158,14 @@
 			mouseover = function(e) {
 				var shape, area_options;
 				area_options = $.metadata ? $.extend({}, options, $(this).metadata()) : options;
-				if(!area_options.neverOn && !area_options.alwaysOn) {
+				if(
+					!area_options.neverOn
+					&&
+					!area_options.alwaysOn
+					&&
+					// .is(':visible') doesn't work on <area>s, interestingly. Always says true
+					$(this).css('display') != 'none'
+				) {
 					shape = shape_from_area(this);
 					add_shape_to(canvas, shape[0], shape[1], area_options, "highlighted");
 				}
