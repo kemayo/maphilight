@@ -3,6 +3,17 @@
 <html>
 <head>
     <title>jQuery maphilight documentation</title>
+    <script type="text/javascript" src="jquery-1.4.2.min.js"></script>
+    <script type="text/javascript" src="jquery.metadata.min.js"></script>
+    <script type="text/javascript" src="../jquery.maphilight.min.js"></script>
+    <script>$(function() {
+        $('.map').maphilight();
+        $('#squidheadlink').mouseover(function(e) {
+            $('#squidhead').mouseover();
+        }).mouseout(function(e) {
+            $('#squidhead').mouseout();
+        }).click(function(e) { e.preventDefault(); });
+    });</script>
 </head>
 <body>
 <h1>A small map</h1>
@@ -24,16 +35,5 @@
     $('#squidhead').mouseout();
 }).click(function(e) { e.preventDefault(); });</code></pre>
 <a href="./">Back to the index</a>
-<script type="text/javascript" src="jquery-1.4.2.min.js"></script>
-    <script type="text/javascript" src="jquery.metadata.min.js"></script>
-    <script type="text/javascript" src="../jquery.maphilight.min.js"></script>
-    <script>$(function() {
-        $('.map').maphilight();
-        $('#squidheadlink').mouseover(function(e) {
-            $('#squidhead').mouseover();
-        }).mouseout(function(e) {
-            $('#squidhead').mouseout();
-        }).click(function(e) { e.preventDefault(); });
-    });</script>
 </body>
 </html>
