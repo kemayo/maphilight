@@ -145,7 +145,7 @@
 				wrapper.remove();
 			}
 
-			wrap = $('<div></div>').css({
+			wrap = $('<div class="'+$(this).attr('class')+'"></div>').css({
                 display:'block',
                 background:'url('+this.src+')',
                 position:'relative',
