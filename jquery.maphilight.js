@@ -169,9 +169,9 @@
 					!area_options.neverOn
 					&&
 					!area_options.alwaysOn
-					&&
+					/*&&
 					// .is(':visible') doesn't work on <area>s, interestingly. Always says true
-					$(this).css('display') != 'none'
+					$(this).css('display') != 'none'*/
 				) {
 					shape = shape_from_area(this);
 					add_shape_to(canvas, shape[0], shape[1], area_options, "highlighted");
