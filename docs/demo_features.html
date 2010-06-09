@@ -13,10 +13,6 @@
         }).mouseout(function(e) {
             $('#square2').mouseout();
         }).click(function(e) { e.preventDefault(); });
-        $('#starlink').click(function(e) {
-            e.preventDefault();
-            $('#star').css('display', $('#star').css('display') == 'none' ? '' : 'none');
-        });
     });</script>
 </head>
 <body>
@@ -32,9 +28,9 @@
 <area href="#" shape="poly" coords="219,190, 225,175, 237,157, 239,148, 245,142, 251,140, 263,140, 265,139, 310,139, 311,145, 364,182, 363,201, 343,221, 333,213, 329,181, 313,177, 330,234, 295,231, 292,174, 279,176, 282,204, 269,220, 255,206, 267,167, 235,193" class="{stroke:false,fillColor:'000000',fillOpacity:1,alwaysOn:true}" title="Metadata'd up a bit"></area>
 -->
     <area id="arrow" shape="poly" style="display:none;" coords="211,3,121,67,112,53,95,103,146,108,136,92,229,25" href="#" alt="arrow"></area>
-    <area id="star" shape="poly" coords="78,83,70,100,52,104,64,115,61,133,78,124,94,133,91,116,104,102,87,101,79,88" href="#" alt="star" class="{strokeColor:'0000ff',strokeWidth:5,fillColor:'ff0000',fillOpacity:0.6}"></area>
+    <area id="star" rel="group" shape="poly" coords="78,83,70,100,52,104,64,115,61,133,78,124,94,133,91,116,104,102,87,101,79,88" href="#" alt="star" class="{strokeColor:'0000ff',strokeWidth:5,fillColor:'ff0000',fillOpacity:0.6}"></area>
     <area id="square1" shape="poly" coords="248,126,222,150,202,122,233,105,239,118,249,125,250,128" href="#" alt="a square" class="{alwaysOn:true,stroke:false,fillColor:'008800'}"></area>
-    <area id="square2" shape="poly" coords="151,249,175,225,182,222,167,193,136,221,153,250" href="#" alt="another square"></area>
+    <area id="square2" shape="poly" coords="151,249,175,225,182,222,167,193,136,221,153,250" href="#" alt="another square" rel="group" class="{groupBy:'rel'}"></area>
 </map>
 </p>
 <p>Features:
@@ -42,8 +38,8 @@
         <li>The big red arrow is an &lt;area&gt; with display:none set. It won't hilight.</li>
         <li>The star uses the metadata plugin to adjust how it looks</li>
         <li>The right-hand square uses the metadata plugin to always be visible, to have no border, and to have a greenish fill</li>
+        <li>The lower-left square is linked to the star using groupBy. When you mouse over it the star will hilight as well.</li>
         <li><a id="hilightlink" href="#">Mouse over this to trigger a hilight from an external element!</a></li>
-        <li><a id="starlink" href="#">Click this to toggle whether or not the star will hilight</a></li>
     </ul>
 </p>
 <small>The image is <a href="http://www.openclipart.org/detail/3325">Ruffled Map by midkiffaries</a></small><br/>

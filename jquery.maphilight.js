@@ -175,6 +175,16 @@
 				) {
 					shape = shape_from_area(this);
 					add_shape_to(canvas, shape[0], shape[1], area_options, "highlighted");
+					if(area_options.groupBy && $(this).attr(area_options.groupBy)) {
+						var first;
+						map.find('area['+area_options.groupBy+'='+$(this).attr(area_options.groupBy)+']').each(function() {
+							if(this != first) {
+								var subarea_options = $.metadata ? $.extend({}, options, $(this).metadata()) : options;
+								shape = shape_from_area(this);
+								add_shape_to(canvas, shape[0], shape[1], subarea_options, "highlighted");
+							}
+						});
+					}
 				}
 			}
 			
@@ -222,6 +232,7 @@
 		strokeWidth: 1,
 		fade: true,
 		alwaysOn: false,
-		neverOn: false
+		neverOn: false,
+		groupBy: false
 	};
 })(jQuery);

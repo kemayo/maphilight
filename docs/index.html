@@ -127,6 +127,9 @@
 				<dt><code>neverOn</code> (Boolean. Default: false)</dt>
 				<dd>Whether to never show the hilighted areas</dd>
 				<dd>(This only makes sense to use as per-area metadata, of course.)</dd>
+				<dt><code>groupBy</code> (String. Default: false)</dt>
+				<dd>The name of an attribute to group areas by</dd>
+				<dd>If this is present then all areas in the map which have the same attribute value as the hovered area will hilight as well</dd>
 			</dl>
 		</div>
 	</div>
@@ -143,7 +146,9 @@
 	strokeOpacity: 1,
 	strokeWidth: 1,
 	fade: true,
-	alwaysOn: false
+	alwaysOn: false,
+	neverOn: false,
+	groupBy: false
 }</code></pre>
 	</div>
 	<h2>Changelog</h2>
