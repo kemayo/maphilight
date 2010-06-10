@@ -1,6 +1,6 @@
 (function($) {
 	var has_VML, create_canvas_for, add_shape_to, clear_canvas, shape_from_area,
-		canvas_style, fader, hex_to_decimal, css3color, is_image_loaded;
+		canvas_style, fader, hex_to_decimal, css3color, is_image_loaded, options_from_area;
 
 	has_VML = document.namespaces;
 	has_canvas = document.createElement('canvas');
@@ -89,12 +89,17 @@
 		for (i=0; i < coords.length; i++) { coords[i] = parseFloat(coords[i]); }
 		return [area.getAttribute('shape').toLowerCase().substr(0,4), coords];
 	};
+
+	options_from_area = function(area, options) {
+		var $area = $(area);
+		return $.extend({}, options, $.metadata ? $area.metadata() : false, $area.data('maphilight'));
+	};
 	
 	is_image_loaded = function(img) {
 		if(!img.complete) { return false; } // IE
 		if(typeof img.naturalWidth != "undefined" && img.naturalWidth == 0) { return false; } // Others
 		return true;
-	}
+	};
 
 	canvas_style = {
 		position: 'absolute',
@@ -131,7 +136,7 @@
 				}, 200);
 			}
 
-			options = $.metadata ? $.extend({}, opts, img.metadata()) : opts;
+			options = $.extend({}, opts, $.metadata ? img.metadata() : false, img.data('maphilight'));
 
 			map = $('map[name="'+img.attr('usemap').substr(1)+'"]');
 
@@ -164,24 +169,23 @@
 			
 			mouseover = function(e) {
 				var shape, area_options;
-				area_options = $.metadata ? $.extend({}, options, $(this).metadata()) : options;
+				area_options = options_from_area(this, options);
 				if(
 					!area_options.neverOn
 					&&
 					!area_options.alwaysOn
-					/*&&
-					// .is(':visible') doesn't work on <area>s, interestingly. Always says true
-					$(this).css('display') != 'none'*/
 				) {
 					shape = shape_from_area(this);
 					add_shape_to(canvas, shape[0], shape[1], area_options, "highlighted");
 					if(area_options.groupBy && $(this).attr(area_options.groupBy)) {
-						var first;
+						var first = this;
 						map.find('area['+area_options.groupBy+'='+$(this).attr(area_options.groupBy)+']').each(function() {
 							if(this != first) {
-								var subarea_options = $.metadata ? $.extend({}, options, $(this).metadata()) : options;
-								shape = shape_from_area(this);
-								add_shape_to(canvas, shape[0], shape[1], subarea_options, "highlighted");
+								var subarea_options = options_from_area(this, options);
+								if(!subarea_options.neverOn && !subarea_options.alwaysOn) {
+									var shape = shape_from_area(this);
+									add_shape_to(canvas, shape[0], shape[1], subarea_options, "highlighted");
+								}
 							}
 						});
 					}
@@ -191,29 +195,27 @@
 			if(options.alwaysOn) {
 				$(map).find('area[coords]').each(mouseover);
 			} else {
-				if($.metadata) {
-					// If the metadata plugin is present, there may be areas with alwaysOn set.
-					// We'll add these to a *second* canvas, which will get around flickering during fading.
-					$(map).find('area[coords]').each(function() {
-						var shape, area_options;
-						area_options = $.metadata ? $.extend({}, options, $(this).metadata()) : options;
-						if(area_options.alwaysOn) {
-							if(!canvas_always) {
-								canvas_always = create_canvas_for(img.get());
-								$(canvas_always).css(canvas_style);
-								canvas_always.width = img.width();
-								canvas_always.height = img.height();
-								img.before(canvas_always);
-							}
-							shape = shape_from_area(this);
-							if ($.browser.msie) {
-								add_shape_to(canvas, shape[0], shape[1], area_options, "");
-							} else {
-								add_shape_to(canvas_always, shape[0], shape[1], area_options, "");
-							}
+				// If the metadata plugin is present, there may be areas with alwaysOn set.
+				// We'll add these to a *second* canvas, which will get around flickering during fading.
+				$(map).find('area[coords]').each(function() {
+					var shape, area_options;
+					area_options = options_from_area(this, options);
+					if(area_options.alwaysOn) {
+						if(!canvas_always) {
+							canvas_always = create_canvas_for(img.get());
+							$(canvas_always).css(canvas_style);
+							canvas_always.width = img.width();
+							canvas_always.height = img.height();
+							img.before(canvas_always);
 						}
-					});
-				}
+						shape = shape_from_area(this);
+						if ($.browser.msie) {
+							add_shape_to(canvas, shape[0], shape[1], area_options, "");
+						} else {
+							add_shape_to(canvas_always, shape[0], shape[1], area_options, "");
+						}
+					}
+				});
 				$(map).find('area[coords]').mouseover(mouseover).mouseout(function(e) { clear_canvas(canvas); });
 			}
 			
