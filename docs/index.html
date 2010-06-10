@@ -97,6 +97,16 @@
 				<dd>
 					<p>A set of key/value pairs that configures the map.  All options are optional.</p>
 					<p>The <a href="http://docs.jquery.com/Plugins/Metadata">metadata plugin</a> is supported, and all options can be overriden per-<code>img</code>, or per-<code>area</code>.</p>
+					<p>Overriding can also be done with the jQuery <code>data</code> method.</p>
+					<p>Order of inheritance:
+						<ol>
+							<li><code>$(area).data('maphilight')</code></li>
+							<li><code>$(area).metadata()</code></li>
+							<li><code>$(img).data('maphilight')</code></li>
+							<li><code>$(img).metadata()</code></li>
+							<li><code>$(img).maphilight(options)</code></li>
+						</ol>
+					</p>
 					<p>Example: to make one particular hilight green:</p>
 					<pre><code>&lt;area ... class="{fillColor:'00ff00'}"></code></pre>
 				</dd>
@@ -123,7 +133,6 @@
 				<dd>Whether to fade in the shapes on mouseover</dd>
 				<dt><code>alwaysOn</code> (Boolean. Default: false)</dt>
 				<dd>Whether to always show the hilighted areas</dd>
-				<dd>(note that this currently has no effect if supplied as metadata on the area itself)</dd>
 				<dt><code>neverOn</code> (Boolean. Default: false)</dt>
 				<dd>Whether to never show the hilighted areas</dd>
 				<dd>(This only makes sense to use as per-area metadata, of course.)</dd>
@@ -153,7 +162,7 @@
 	</div>
 	<h2>Changelog</h2>
 	<ul>
-        <li>1.2.1: Fix a Chrome bug. Apply the class on the img to the wrapper div created by maphilight.</li>
+		<li>1.2.1: Fix a Chrome bug. Apply the class on the img to the wrapper div created by maphilight.</li>
 		<li>1.2: Made <code>alwaysOn</code> work per-area with metadata plugin.</li>
 		<li>1.1: Added <code>alwaysOn</code> option. Fixed behavior in Firefox2/Safari/Opera.</li>
 		<li>1.0: First release.</li>
