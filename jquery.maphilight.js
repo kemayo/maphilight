@@ -146,13 +146,13 @@
 			}
 
 			wrap = $('<div class="'+$(this).attr('class')+'"></div>').css({
-                display:'block',
-                background:'url('+this.src+')',
-                position:'relative',
-                padding:0,
-                width:this.width,
-                height:this.height
-                });
+				display:'block',
+				background:'url('+this.src+')',
+				position:'relative',
+				padding:0,
+				width:this.width,
+				height:this.height
+				});
 			img.before(wrap).css('opacity', 0).css(canvas_style).remove();
 			if($.browser.msie) { img.css('filter', 'Alpha(opacity=0)'); }
 			wrap.append(img);
