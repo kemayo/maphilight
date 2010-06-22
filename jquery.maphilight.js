@@ -3,8 +3,7 @@
 		canvas_style, fader, hex_to_decimal, css3color, is_image_loaded, options_from_area;
 
 	has_VML = document.namespaces;
-	has_canvas = document.createElement('canvas');
-	has_canvas = has_canvas && has_canvas.getContext;
+	has_canvas = !!document.createElement('canvas').getContext;
 
 	if(!(has_canvas || has_VML)) {
 		$.fn.maphilight = function() { return this; };
@@ -126,7 +125,7 @@
 		}
 		
 		return this.each(function() {
-			var img, wrap, options, map, canvas, canvas_always, mouseover, highlighted_shape;
+			var img, wrap, options, map, canvas, canvas_always, mouseover, highlighted_shape, usemap;
 			img = $(this);
 
 			if(!is_image_loaded(this)) {
@@ -138,9 +137,13 @@
 
 			options = $.extend({}, opts, $.metadata ? img.metadata() : false, img.data('maphilight'));
 
-			map = $('map[name="'+img.attr('usemap').substr(1)+'"]');
+			// jQuery bug with Opera, results in full-url#usemap being returned from jQuery's attr.
+			// So use raw getAttribute instead.
+			usemap = img.get(0).getAttribute('usemap');
 
-			if(!(img.is('img') && img.attr('usemap') && map.size() > 0)) { return; }
+			map = $('map[name="'+usemap.substr(1)+'"]');
+
+			if(!(img.is('img') && usemap && map.size() > 0)) { return; }
 
 			if(img.hasClass('maphilighted')) {
 				// We're redrawing an old map, probably to pick up changes to the options.
