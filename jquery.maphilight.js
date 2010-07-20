@@ -151,6 +151,7 @@
 				var wrapper = img.parent();
 				img.insertBefore(wrapper);
 				wrapper.remove();
+				$(map).unbind('.maphilight').find('area[coords]').unbind('.maphilight');
 			}
 
 			wrap = $('<div></div>').css({
@@ -234,8 +235,8 @@
 			} else {
 				$(map).find('area[coords]')
 					.trigger('alwaysOn.maphilight')
-					.mouseover(mouseover)
-					.mouseout(function(e) { clear_canvas(canvas); });
+					.bind('mouseover.maphilight', mouseover)
+					.bind('mouseout.maphilight', function(e) { clear_canvas(canvas); });
 			}
 			
 			img.before(canvas); // if we put this after, the mouseover events wouldn't fire.
