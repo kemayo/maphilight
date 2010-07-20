@@ -19,6 +19,12 @@
             data.neverOn = !data.neverOn;
             $('#star').data('maphilight', data);
         });
+        $('#starlink2').click(function(e) {
+            e.preventDefault();
+            var data = $('#star').data('maphilight') || {};
+            data.alwaysOn = !data.alwaysOn;
+            $('#star').data('maphilight', data).trigger('alwaysOn.maphilight');
+        });
     });</script>
 </head>
 <body>
@@ -41,6 +47,7 @@
         <li>The lower-left square is linked to the star using groupBy. When you mouse over it the star will hilight as well.</li>
         <li><a id="hilightlink" href="#">Mouse over this to trigger a hilight from an external element!</a></li>
         <li><a id="starlink" href="#">Click this to toggle whether or not the star will hilight</a></li>
+        <li><a id="starlink2" href="#">Click this to toggle whether or not the star is always hilighted</a></li>
     </ul>
 </p>
 <small>The image is <a href="http://www.openclipart.org/detail/3325">Ruffled Map by midkiffaries</a></small><br/>

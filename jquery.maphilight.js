@@ -201,12 +201,13 @@
 					}
 				}
 			}
-			
-			if(options.alwaysOn) {
-				$(map).find('area[coords]').each(mouseover);
-			} else {
-				// If the metadata plugin is present, there may be areas with alwaysOn set.
-				// We'll add these to a *second* canvas, which will get around flickering during fading.
+
+			$(map).bind('alwaysOn.maphilight', function() {
+				// Check for areas with alwaysOn set. These are added to a *second* canvas,
+				// which will get around flickering during fading.
+				if(canvas_always) {
+					clear_canvas(canvas_always)
+				}
 				$(map).find('area[coords]').each(function() {
 					var shape, area_options;
 					area_options = options_from_area(this, options);
@@ -226,7 +227,15 @@
 						}
 					}
 				});
-				$(map).find('area[coords]').mouseover(mouseover).mouseout(function(e) { clear_canvas(canvas); });
+			});
+			
+			if(options.alwaysOn) {
+				$(map).find('area[coords]').each(mouseover);
+			} else {
+				$(map).find('area[coords]')
+					.trigger('alwaysOn.maphilight')
+					.mouseover(mouseover)
+					.mouseout(function(e) { clear_canvas(canvas); });
 			}
 			
 			img.before(canvas); // if we put this after, the mouseover events wouldn't fire.
