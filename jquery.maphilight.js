@@ -56,7 +56,7 @@
 				fader(canvas, 0);
 			}
 		};
-		clear_canvas = function(canvas, area) {
+		clear_canvas = function(canvas) {
 			canvas.getContext('2d').clearRect(0, 0, canvas.width,canvas.height);
 		};
 	} else {   // ie executes this code
@@ -209,11 +209,14 @@
 				if(canvas_always) {
 					clear_canvas(canvas_always)
 				}
+				if(!has_canvas) {
+					$(canvas).empty();
+				}
 				$(map).find('area[coords]').each(function() {
 					var shape, area_options;
 					area_options = options_from_area(this, options);
 					if(area_options.alwaysOn) {
-						if(!canvas_always) {
+						if(!canvas_always && has_canvas) {
 							canvas_always = create_canvas_for(img.get());
 							$(canvas_always).css(canvas_style);
 							canvas_always.width = img.width();
@@ -221,10 +224,10 @@
 							img.before(canvas_always);
 						}
 						shape = shape_from_area(this);
-						if ($.browser.msie) {
-							add_shape_to(canvas, shape[0], shape[1], area_options, "");
-						} else {
+						if (has_canvas) {
 							add_shape_to(canvas_always, shape[0], shape[1], area_options, "");
+						} else {
+							add_shape_to(canvas, shape[0], shape[1], area_options, "");
 						}
 					}
 				});
