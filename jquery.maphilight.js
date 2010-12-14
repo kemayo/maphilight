@@ -125,7 +125,7 @@
 		}
 		
 		return this.each(function() {
-			var img, wrap, options, map, canvas, canvas_always, mouseover, highlighted_shape, usemap;
+			var img, wrap, options, map, canvas, canvas_always, canvas_clicked, mouseover, highlighted_shape, usemap;
 			img = $(this);
 
 			if(!is_image_loaded(this)) {
@@ -186,21 +186,57 @@
 					&&
 					!area_options.alwaysOn
 				) {
-					shape = shape_from_area(this);
-					add_shape_to(canvas, shape[0], shape[1], area_options, "highlighted");
-					if(area_options.groupBy && $(this).attr(area_options.groupBy)) {
-						var first = this;
-						map.find('area['+area_options.groupBy+'='+$(this).attr(area_options.groupBy)+']').each(function() {
-							if(this != first) {
-								var subarea_options = options_from_area(this, options);
-								if(!subarea_options.neverOn && !subarea_options.alwaysOn) {
-									var shape = shape_from_area(this);
-									add_shape_to(canvas, shape[0], shape[1], subarea_options, "highlighted");
+					
+					/***** Check: if we are leaving hover states after click, we don't want double fades *****/
+					if (! area_options.stayClicked || ! $(this).hasClass('selected')) {
+						shape = shape_from_area(this);
+						add_shape_to(canvas, shape[0], shape[1], area_options, "highlighted");
+						if(area_options.groupBy && $(this).attr(area_options.groupBy)) {
+							var first = this;
+							map.find('area['+area_options.groupBy+'='+$(this).attr(area_options.groupBy)+']').each(function() {
+								if(this != first) {
+									var subarea_options = options_from_area(this, options);
+									if(!subarea_options.neverOn && !subarea_options.alwaysOn) {
+										var shape = shape_from_area(this);
+										add_shape_to(canvas, shape[0], shape[1], subarea_options, "highlighted");
+									}
 								}
-							}
-						});
+							});
+						}
 					}
+					
 				}
+			}
+			/***** New click code *****/
+			click = function(e){ 
+				
+				if(canvas_clicked) {
+					$(map).find('.selected').removeClass('selected');
+					clear_canvas(canvas_clicked);
+					clear_canvas(canvas);
+				}
+				$(this).addClass('selected');						
+				if(!has_canvas) {
+					$(canvas).empty();
+				}
+				$(map).find('.selected').each(function() {
+					var shape, area_options;
+					area_options = options_from_area(this, options);
+					if(area_options.stayClicked) {
+						if (has_canvas) {
+
+							if(!canvas_clicked) {
+								canvas_clicked = create_canvas_for(img.get());
+								$(canvas_clicked).css(canvas_style);
+								canvas_clicked.width = img.width();
+								canvas_clicked.height = img.height();
+								img.before(canvas_clicked);
+							}
+							shape = shape_from_area(this);
+							add_shape_to(canvas_clicked, shape[0], shape[1], area_options, "");
+						}
+					}
+				});
 			}
 
 			$(map).bind('alwaysOn.maphilight', function() {
@@ -239,7 +275,9 @@
 				$(map).find('area[coords]')
 					.trigger('alwaysOn.maphilight')
 					.bind('mouseover.maphilight', mouseover)
-					.bind('mouseout.maphilight', function(e) { clear_canvas(canvas); });
+					.bind('mouseout.maphilight', function(e) { clear_canvas(canvas); })
+					.bind('click.maphilight', click)
+					;
 			}
 			
 			img.before(canvas); // if we put this after, the mouseover events wouldn't fire.
@@ -259,6 +297,7 @@
 		alwaysOn: false,
 		neverOn: false,
 		groupBy: false,
-		wrapClass: true
+		wrapClass: true,
+		stayClicked: false
 	};
 })(jQuery);
