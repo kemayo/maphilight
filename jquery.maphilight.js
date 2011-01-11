@@ -236,8 +236,7 @@
 			if(options.alwaysOn) {
 				$(map).find('area[coords]').each(mouseover);
 			} else {
-				$(map).find('area[coords]')
-					.trigger('alwaysOn.maphilight')
+				$(map).trigger('alwaysOn.maphilight').find('area[coords]')
 					.bind('mouseover.maphilight', mouseover)
 					.bind('mouseout.maphilight', function(e) { clear_canvas(canvas); });
 			}
