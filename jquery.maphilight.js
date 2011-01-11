@@ -200,6 +200,8 @@
 							}
 						});
 					}
+					// workaround for IE7, IE8 not rendering the final rectangle in a group
+					$(canvas).append('<v:rect></v:rect>');
 				}
 			}
 
