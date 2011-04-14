@@ -156,7 +156,7 @@
 
 			wrap = $('<div></div>').css({
 				display:'block',
-				background:'url('+this.src+')',
+				background:'url("'+this.src+'")',
 				position:'relative',
 				padding:0,
 				width:this.width,
