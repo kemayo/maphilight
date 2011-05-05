@@ -5,6 +5,8 @@
 	has_VML = document.namespaces;
 	has_canvas = !!document.createElement('canvas').getContext;
 
+	has_canvas = has_canvas && !$.browser.msie;
+
 	if(!(has_canvas || has_VML)) {
 		$.fn.maphilight = function() { return this; };
 		return;
