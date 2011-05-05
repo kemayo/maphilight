@@ -1,6 +1,6 @@
 (function($) {
 	var has_VML, create_canvas_for, add_shape_to, clear_canvas, shape_from_area,
-		canvas_style, fader, hex_to_decimal, css3color, is_image_loaded, options_from_area;
+		canvas_style, hex_to_decimal, css3color, is_image_loaded, options_from_area;
 
 	has_VML = document.namespaces;
 	has_canvas = !!document.createElement('canvas').getContext;
@@ -11,13 +11,6 @@
 	}
 	
 	if(has_canvas) {
-		fader = function(element, opacity, interval) {
-			if(opacity <= 1) {
-				element.style.opacity = opacity;
-				window.setTimeout(fader, 10, element, opacity + 0.1, 10);
-			}
-		};
-		
 		hex_to_decimal = function(hex) {
 			return Math.max(0, Math.min(parseInt(hex, 16), 255));
 		};
@@ -53,7 +46,7 @@
 				context.stroke();
 			}
 			if(options.fade) {
-				fader(canvas, 0);
+				$(canvas).css('opacity', 0).animate({opacity: 1}, 100);
 			}
 		};
 		clear_canvas = function(canvas) {
@@ -112,7 +105,7 @@
 	$.fn.maphilight = function(opts) {
 		opts = $.extend({}, $.fn.maphilight.defaults, opts);
 		
-		if($.browser.msie && !ie_hax_done) {
+		if(!has_canvas && $.browser.msie && !ie_hax_done) {
 			document.namespaces.add("v", "urn:schemas-microsoft-com:vml");
 			var style = document.createStyleSheet();
 			var shapes = ['shape','rect', 'oval', 'circ', 'fill', 'stroke', 'imagedata', 'group','textbox'];
@@ -143,7 +136,9 @@
 
 			map = $('map[name="'+usemap.substr(1)+'"]');
 
-			if(!(img.is('img') && usemap && map.size() > 0)) { return; }
+			if(!(img.is('img') && usemap && map.size() > 0)) {
+				return;
+			}
 
 			if(img.hasClass('maphilighted')) {
 				// We're redrawing an old map, probably to pick up changes to the options.
@@ -190,7 +185,7 @@
 					add_shape_to(canvas, shape[0], shape[1], area_options, "highlighted");
 					if(area_options.groupBy && $(this).attr(area_options.groupBy)) {
 						var first = this;
-						map.find('area['+area_options.groupBy+'='+$(this).attr(area_options.groupBy)+']').each(function() {
+						map.find('area['+area_options.groupBy+'="'+$(this).attr(area_options.groupBy)+'"]').each(function() {
 							if(this != first) {
 								var subarea_options = options_from_area(this, options);
 								if(!subarea_options.neverOn && !subarea_options.alwaysOn) {
@@ -201,7 +196,9 @@
 						});
 					}
 					// workaround for IE7, IE8 not rendering the final rectangle in a group
-					$(canvas).append('<v:rect></v:rect>');
+					if(!has_canvas) {
+						$(canvas).append('<v:rect></v:rect>');
+					}
 				}
 			}
 
@@ -225,6 +222,7 @@
 							canvas_always.height = img.height();
 							img.before(canvas_always);
 						}
+						area_options.fade = area_options.alwaysOnFade; // alwaysOn shouldn't fade in initially
 						shape = shape_from_area(this);
 						if (has_canvas) {
 							add_shape_to(canvas_always, shape[0], shape[1], area_options, "");
