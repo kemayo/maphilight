@@ -183,9 +183,16 @@
 				) {
 					shape = shape_from_area(this);
 					add_shape_to(canvas, shape[0], shape[1], area_options, "highlighted");
-					if(area_options.groupBy && $(this).attr(area_options.groupBy)) {
+					if(area_options.groupBy) {
+						var areas;
+						// two ways groupBy might work; attribute and selector
+						if(/^[a-zA-Z][-a-zA-Z]+$/.test(area_options.groupBy)) {
+							areas = map.find('area['+area_options.groupBy+'="'+$(this).attr(area_options.groupBy)+'"]')
+						} else {
+							areas = map.find(area_options.groupBy);
+						}
 						var first = this;
-						map.find('area['+area_options.groupBy+'="'+$(this).attr(area_options.groupBy)+'"]').each(function() {
+						areas.each(function() {
 							if(this != first) {
 								var subarea_options = options_from_area(this, options);
 								if(!subarea_options.neverOn && !subarea_options.alwaysOn) {
