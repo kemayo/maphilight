@@ -153,6 +153,7 @@
 				display:'block',
 				background:'url("'+this.src+'")',
 				position:'relative',
+				backgroundSize: this.width +"px " + this.height + "px",
 				padding:0,
 				width:this.width,
 				height:this.height
