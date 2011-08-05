@@ -46,8 +46,11 @@ if len(sys.argv) >= 3:
 svg_file = xml.dom.minidom.parse(sys.argv[1])
 svg = svg_file.getElementsByTagName('svg')[0]
 
-raw_width = float(svg.getAttribute('width'))
-raw_height = float(svg.getAttribute('height'))
+non_decimal = re.compile(r'[^\d.]+')
+make_decimal = lambda x: non_decimal.sub('', x)
+
+raw_width = float(make_decimal(svg.getAttribute('width')))
+raw_height = float(make_decimal(svg.getAttribute('height')))
 width_ratio = x and (x / raw_width) or 1
 height_ratio = y and (y / raw_height) or 1
 
@@ -62,9 +65,12 @@ for e in elements:
     paths = []
     if e.nodeName == 'g':
         for path in e.getElementsByTagName('path'):
+            gelem = path.parentNode
             points = parse_path.get_points(path.getAttribute('d'))
             for pointset in points:
-                paths.append([path.getAttribute('id'), pointset])
+                paths.append([path.getAttribute('id'), pointset, 
+                             gelem.getAttribute('title'), gelem.getAttribute('iso'),
+                             gelem.getAttribute('alt')])
     else:
         points = parse_path.get_points(e.getAttribute('d'))
         for pointset in points:
@@ -83,8 +89,11 @@ for e in elements:
 out = []
 for g in parsed_groups:
     for path in parsed_groups[g]:
-        out.append('<area href="#" title="%s" shape="poly" coords="%s"></area>' %
-            (path[0], ', '.join([("%d,%d" % (p[0]*width_ratio, p[1]*height_ratio)) for p in path[1]])))
+        out.append('<area href="#" title="%s" shape="poly" coords="%s" iso="%s" alt="%s"></area>' %
+            (path[2] if path[2] else path[0], 
+            ', '.join([("%d,%d" % (p[0]*width_ratio, p[1]*height_ratio)) for p in path[1]]),
+            path[3], path[4]))
 
 outfile = open(sys.argv[1].replace('.svg', '.html'), 'w')
 outfile.write('\n'.join(out))
+
