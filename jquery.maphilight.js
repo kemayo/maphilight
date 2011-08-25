@@ -45,6 +45,30 @@
 				context.lineWidth = options.strokeWidth;
 				context.stroke();
 			}
+			if(options.shadow && shape == 'rect') {
+				context.save();  // store canvas state
+
+				// define clipping region
+				context.beginPath();
+				context.rect(0, 0, canvas.width, canvas.height);
+				context.rect(coords[0], coords[1]+(coords[3] - coords[1]), coords[2] - coords[0], -(coords[3] - coords[1]));
+				context.closePath();
+				context.clip()
+				
+				// draw shadow
+				context.fillStyle = 'rgb(255,255,255)';
+				context.beginPath();
+				context.rect(coords[0], coords[1]+(coords[3] - coords[1]), coords[2] - coords[0], -(coords[3] - coords[1]));
+				context.closePath();
+				context.shadowOffsetX = options.shadowX;
+				context.shadowOffsetY = options.shadowY;
+				context.shadowBlur = options.shadowRadius;
+				context.shadowColor = css3color(options.shadowColor, options.shadowOpacity);
+				context.fill();
+				context.stroke();
+				
+				context.restore(); // restore canvas state
+			}
 			if(options.fade) {
 				$(canvas).css('opacity', 0).animate({opacity: 1}, 100);
 			}
