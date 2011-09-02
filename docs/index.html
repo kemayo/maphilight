@@ -3,7 +3,7 @@
 <html>
 <head>
 	<title>jQuery maphilight documentation</title>
-	<script type="text/javascript" src="jquery-1.4.2.min.js"></script>
+	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.min.js"></script>
 	<script type="text/javascript" src="ui.tabs.pack.js"></script>
 	<link rel="stylesheet" type="text/css" href="ui.tabs.css" />
 	<style type="text/css">
@@ -142,6 +142,22 @@
 				<dt><code>wrapClass</code> (String/bool. Default: false)</dt>
 				<dd>If true, applies the class on the &lt;img&gt; to the wrapper div maphilight created.</dd>
 				<dd>If a string, that string is used as a class on the wrapper div.</dd>
+				<dt><code>shadow</code> (Boolean. Default: false)</dt>
+				<dd>Whether to apply a shadow to the shape. (Only works with canvas-supporting browsers. So, everything but IE below version 9.)</dd>
+				<dt><code>shadowPosition</code> (String. Default: 'outside')</dt>
+				<dd>Where to position the shadow. Can be 'outside', 'inside', or 'both'.</dd>
+				<dt><code>shadowFrom</code> (String/bool. Default: false)</dt>
+				<dd>What to use to cast the shadow. Can be 'stroke' or 'fill'. If false, choose a value based on the shadow position. (Generally it looks better if it's being cast from a fill when it's outside the shape, and from a stroke when it's inside the shape.)</dd>
+				<dt><code>shadowX</code> (Number. Default: 0)</dt>
+				<dd>Horizontal offset of the shadow from the shape.</dd>
+				<dt><code>shadowY</code> (Number. Default: 0)</dt>
+				<dd>Vertical offset of the shadow from the shape.</dd>
+				<dt><code>shadowRadius</code> (Number. Default: 6)</dt>
+				<dd>Size of the shadow.</dd>
+				<dt><code>shadowColor</code> (String. Default: '000000')</dt>
+				<dd>Color of the shadow.</dd>
+				<dt><code>shadowOpacity</code> (Number. Default: 0.8)</dt>
+				<dd>Opacity of the shadow.</dd>
 			</dl>
 		</div>
 	</div>
@@ -160,7 +176,16 @@
 	fade: true,
 	alwaysOn: false,
 	neverOn: false,
-	groupBy: false
+	groupBy: false,
+	wrapClass: true,
+	shadow: false,
+	shadowX: 0,
+	shadowY: 0,
+	shadowRadius: 6,
+	shadowColor: '000000',
+	shadowOpacity: 0.8,
+	shadowPosition: 'outside',
+	shadowFrom: false
 }</code></pre>
 	</div>
 	<h2>Changelog</h2>
@@ -176,15 +201,16 @@
 		<li>Firefox 2, 3</li>
 		<li>IE 6, 7, 8</li>
 		<li>Safari 3, 4</li>
-        <li>Chrome 4, 5</li>
+		<li>Chrome 4, 5</li>
 		<li>Opera 9, 10</li>
 	</ul>
 	<h2>Contributors</h2>
 	These people have contributed in some way to the project:
 	<ul>
 		<li>Billy Earney (@ University of Missouri): fixed alwaysOn for IE</li>
-		<li>Travis Balzarini (@ Sonoma County Web Team): fixed IE 8
-        <li><a href="http://stackoverflow.com/users/92414/solutionyogi">SolutionYogi</a>: Also fixed IE 8 :)
+		<li>Travis Balzarini (@ Sonoma County Web Team): fixed IE 8</li>
+		<li><a href="http://stackoverflow.com/users/92414/solutionyogi">SolutionYogi</a>: Also fixed IE 8 :)</li>
+		<li><a href="https://github.com/Raven24">Florian Staudacher</a>: provided the initial version of shadows</li>
 	</ul>
 </body>
 </html>
