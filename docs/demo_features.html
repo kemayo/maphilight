@@ -21,9 +21,9 @@
             data.neverOn = !data.neverOn;
             $('#star').data('maphilight', data);
         });
-        $('#starlink2').click(function(e) {
+        $('#star,#starlink2').click(function(e) {
             e.preventDefault();
-            var data = $('#star').data('maphilight') || {};
+            var data = $('#star').mouseout().data('maphilight') || {};
             data.alwaysOn = !data.alwaysOn;
             $('#star').data('maphilight', data).trigger('alwaysOn.maphilight');
         });
@@ -51,7 +51,7 @@
         <li>The lower-right square has a shadow.</li>
         <li><a id="hilightlink" href="#">Mouse over this to trigger a hilight from an external element!</a></li>
         <li><a id="starlink" href="#">Click this to toggle whether or not the star will hilight</a></li>
-        <li><a id="starlink2" href="#">Click this to toggle whether or not the star is always hilighted</a></li>
+        <li><a id="starlink2" href="#">Click this to toggle whether or not the star is always hilighted; or click the star itself</a></li>
     </ul>
 <small>The image is <a href="http://www.openclipart.org/detail/3325">Ruffled Map by midkiffaries</a></small><br/>
 <a href="./">Back to the index</a>
