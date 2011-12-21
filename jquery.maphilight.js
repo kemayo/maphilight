@@ -317,7 +317,7 @@
 			
 			$(map).trigger('alwaysOn.maphilight').find('area[coords]')
 				.bind('mouseover.maphilight', mouseover)
-				.bind('mouseout.maphilight', function(e) { clear_canvas(canvas); });;
+				.bind('mouseout.maphilight', function(e) { clear_canvas(canvas); });
 			
 			img.before(canvas); // if we put this after, the mouseover events wouldn't fire.
 			
