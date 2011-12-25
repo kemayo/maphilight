@@ -164,7 +164,7 @@
 					fontSizeUnit = options.textFontSize.replace(fontSize, ""),
 					fontLineHeight = fontSize;
 
-				context.fillStyle = options.textColor;
+				context.fillStyle = css3color(options.textColor, 1);
 				context.font = fontSize + fontSizeUnit + ' ' + options.textFontFamily;
 				context.textAlign = options.textAlign;
 				context.textBaseline = options.textBaseline;
@@ -181,34 +181,34 @@
 				context.font = fontSize + fontSizeUnit + ' ' + options.textFontFamily;
 
 				switch (options.textAlign) {
-				default:
-				case "left":
-				case "start":
-					// assuming l-t-r;
-					break;
-				case "center":
-					offsetX += textCoordinates.width / 2;
-					break;
-				case "right":
-				case "end":
-					// assuming r-t-l;
-					offsetX += textCoordinates.width;
-					break;
+					default:
+					case "left":
+					case "start":
+						// assuming l-t-r;
+						break;
+					case "center":
+						offsetX += textCoordinates.width / 2;
+						break;
+					case "right":
+					case "end":
+						// assuming r-t-l;
+						offsetX += textCoordinates.width;
+						break;
 				}
 
 				switch (options.textBaseline) {
-				case "top":
-				case "hanging":
-					break;
-				default:
-				case "middle":
-					offsetY += (textCoordinates.height / 2) - (fontLineHeight * (sentences.length - 1) / 2);
-					break;
-				case "alphabetic":
-				case "ideographic":
-				case "bottom":
-					offsetY += textCoordinates.height - (fontLineHeight * (sentences.length - 1));
-					break;
+					case "top":
+					case "hanging":
+						break;
+					default:
+					case "middle":
+						offsetY += (textCoordinates.height / 2) - (fontLineHeight * (sentences.length - 1) / 2);
+						break;
+					case "alphabetic":
+					case "ideographic":
+					case "bottom":
+						offsetY += textCoordinates.height - (fontLineHeight * (sentences.length - 1));
+						break;
 				}
 
 				for (var ii = 0; ii < sentences.length; ii++) {
