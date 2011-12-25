@@ -44,6 +44,46 @@
 				context.closePath();
 			};
 
+
+		var calculateCenter = function(shape, coords) {
+				var boundary = {
+					x: 0,
+					y: 0,
+					width: 0,
+					height: 0
+				};
+				switch (shape) {
+				case 'rect':
+					boundary.x = coords[0];
+					boundary.y = coords[1];
+					boundary.width = coords[2] - boundary.x;
+					boundary.height = coords[3] - boundary.y;
+					break;
+				case 'poly':
+					var xLow = coords[0],
+						xHigh = coords[0],
+						yLow = coords[1],
+						yHigh = coords[1];
+					for (var i = 2; i < coords.length; i += 2) {
+						xLow = Math.min(xLow, coords[i]);
+						xHigh = Math.max(xHigh, coords[i]);
+						yLow = Math.min(yLow, coords[i + 1]);
+						yHigh = Math.max(yHigh, coords[i + 1]);
+					}
+					boundary.x = xLow;
+					boundary.y = yLow;
+					boundary.width = xHigh - boundary.x;
+					boundary.height = yHigh - boundary.y;
+					break;
+				case 'circ':
+					boundary.x = coords[0] - coords[2];
+					boundary.y = coords[1] - coords[2];
+					boundary.width = boundary.height = coords[2] * 2;
+					break;
+				}
+				return boundary;
+			};
+
 		add_shape_to = function(canvas, shape, coords, options) {
 			var context = canvas.getContext('2d');
 			// Because I don't want to worry about setting things back to a base state
@@ -113,6 +153,69 @@
 				context.lineWidth = options.strokeWidth;
 				context.stroke();
 			}
+			// After all painting we put text above it.
+			if (options.text) {
+				var textCoordinates = calculateCenter(shape, coords),
+					offsetX = textCoordinates.x,
+					offsetY = textCoordinates.y,
+					sentences = options.text.split("\\n"),
+					metricsWidth = 0,
+					fontSize = parseInt(options.textFontSize, 10),
+					fontSizeUnit = options.textFontSize.replace(fontSize, ""),
+					fontLineHeight = fontSize;
+
+				context.fillStyle = options.textColor;
+				context.font = fontSize + fontSizeUnit + ' ' + options.textFontFamily;
+				context.textAlign = options.textAlign;
+				context.textBaseline = options.textBaseline;
+
+				if (options.textFit) {
+					for (var i = 0; i < sentences.length; i++) {
+						var metrics = context.measureText(sentences[i]);
+						metricsWidth = Math.max(metricsWidth, metrics.width);
+					}
+					fontSize *= (textCoordinates.width / metricsWidth);
+					fontLineHeight *= (textCoordinates.width / metricsWidth);
+				}
+
+				context.font = fontSize + fontSizeUnit + ' ' + options.textFontFamily;
+
+				switch (options.textAlign) {
+				default:
+				case "left":
+				case "start":
+					// assuming l-t-r;
+					break;
+				case "center":
+					offsetX += textCoordinates.width / 2;
+					break;
+				case "right":
+				case "end":
+					// assuming r-t-l;
+					offsetX += textCoordinates.width;
+					break;
+				}
+
+				switch (options.textBaseline) {
+				case "top":
+				case "hanging":
+					break;
+				default:
+				case "middle":
+					offsetY += (textCoordinates.height / 2) - (fontLineHeight * (sentences.length - 1) / 2);
+					break;
+				case "alphabetic":
+				case "ideographic":
+				case "bottom":
+					offsetY += textCoordinates.height - (fontLineHeight * (sentences.length - 1));
+					break;
+				}
+
+				for (var ii = 0; ii < sentences.length; ii++) {
+					context.fillText(sentences[ii], offsetX, offsetY + (fontLineHeight * ii));
+				}
+			}
+
 			context.restore();
 			if (options.fade) {
 				$(canvas).css('opacity', 0).animate({
@@ -128,7 +231,7 @@
 		create_canvas_for = function(img) {
 			return $('<var style="zoom:1;overflow:hidden;display:block;width:' + img.width + 'px;height:' + img.height + 'px;"></var>').get(0);
 		};
-		
+
 		add_shape_to = function(canvas, shape, coords, options, name) {
 			var e, fill = '<v:fill color="#' + options.fillColor + '" opacity="' + (options.fill ? options.fillOpacity : 0) + '" />',
 				stroke = (options.stroke ? 'strokeweight="' + options.strokeWidth + '" stroked="t" strokecolor="#' + options.strokeColor + '"' : 'stroked="f"'),
@@ -146,12 +249,12 @@
 			e.get(0).innerHTML = fill + opacity;
 			$(canvas).append(e);
 		};
-		
+
 		clear_canvas = function(canvas) {
 			$(canvas).find('[name=highlighted]').remove();
 		};
 	}
-	
+
 	shape_from_area = function(area) {
 		var i, coords = area.getAttribute('coords').split(',');
 		for (i = 0; i < coords.length; i++) {
@@ -159,22 +262,29 @@
 		}
 		return [area.getAttribute('shape').toLowerCase().substr(0, 4), coords];
 	};
-	
+
 	options_from_area = function(area, options) {
-		var $area = $(area);
-		return $.extend({}, options, $.metadata ? $area.metadata() : false, $area.data('maphilight'));
+		var $area = $(area),
+			opts = $.extend({}, options, $.metadata ? $area.metadata() : false, $area.data('maphilight'));
+		if (opts.text !== false && typeof opts.text !== "string") {
+			opts.text = area.title;
+			if (opts.text === "") {
+				opts.text = false;
+			}
+		}
+		return opts;
 	};
-	
+
 	is_image_loaded = function(img) {
-		if (!img.complete) {
+		if (!img.complete) { // IE
 			return false;
-		} // IE
-		if (typeof img.naturalWidth != "undefined" && img.naturalWidth === 0) {
+		}
+		if (typeof img.naturalWidth != "undefined" && img.naturalWidth === 0) { // Others
 			return false;
-		} // Others
+		}
 		return true;
 	};
-	
+
 	canvas_style = {
 		position: 'absolute',
 		left: 0,
@@ -182,10 +292,12 @@
 		padding: 0,
 		border: 0
 	};
-	
+
 	var ie_hax_done = false;
+
 	$.fn.maphilight = function(opts) {
 		opts = $.extend({}, $.fn.maphilight.defaults, opts);
+
 		if (!has_canvas && $.browser.msie && !ie_hax_done) {
 			document.namespaces.add("v", "urn:schemas-microsoft-com:vml");
 			var style = document.createStyleSheet();
@@ -195,17 +307,21 @@
 			});
 			ie_hax_done = true;
 		}
+
 		return this.each(function() {
 			var img = $(this),
 				wrap, options, map, canvas, canvas_always, mouseover, usemap;
+
 			if (!is_image_loaded(this)) {
 				// If the image isn't fully loaded, this won't work right.  Try again later.
 				return window.setTimeout(function() {
 					img.maphilight(opts);
 				}, 200);
 			}
+
 			options = $.extend({}, opts, $.metadata ? img.metadata() : false, img.data('maphilight'));
-			// jQuery bug with Opera, results in full-url#usemap being returned from jQuery's attr.
+
+			// jQuery bug with Opera, results in full-url #usemap being returned from jQuery's attr.
 			// So use raw getAttribute instead.
 			usemap = img.get(0).getAttribute('usemap');
 			map = $('map[name="' + usemap.substr(1) + '"]');
@@ -218,7 +334,7 @@
 				var wrapper = img.parent();
 				img.insertBefore(wrapper);
 				wrapper.remove();
-				$(map).unbind('.maphilight').find('area[coords]').unbind('.maphilight');
+				map.unbind('.maphilight').find('area[coords]').unbind('.maphilight');
 			}
 			wrap = $('<div></div>').css({
 				display: 'block',
@@ -241,12 +357,12 @@
 				img.css('filter', 'Alpha(opacity=0)');
 			}
 			wrap.append(img);
-			
+
 			canvas = create_canvas_for(this);
 			$(canvas).css(canvas_style);
 			canvas.height = this.height;
 			canvas.width = this.width;
-			
+
 			mouseover = function() {
 				var shape, area_options;
 				area_options = options_from_area(this, options);
@@ -279,8 +395,8 @@
 					}
 				}
 			};
-			
-			$(map).bind('alwaysOn.maphilight', function() {
+
+			map.bind('alwaysOn.maphilight', function() {
 				// Check for areas with alwaysOn set. These are added to a *second* canvas,
 				// which will get around flickering during fading.
 				if (canvas_always) {
@@ -289,7 +405,7 @@
 				if (!has_canvas) {
 					$(canvas).empty();
 				}
-				$(map).find('area[coords]').each(function() {
+				map.find('area[coords]').each(function() {
 					var shape, area_options;
 					area_options = options_from_area(this, options);
 					if (area_options.alwaysOn) {
@@ -311,28 +427,30 @@
 					}
 				});
 			});
-			$(map).trigger('alwaysOn.maphilight').find('area[coords]').bind('mouseover.maphilight', mouseover).bind('mouseout.maphilight', function() {
+			map.trigger('alwaysOn.maphilight').find('area[coords]').bind('mouseover.maphilight', mouseover).bind('mouseout.maphilight', function() {
 				clear_canvas(canvas);
 			});
 			img.before(canvas); // if we put this after, the mouseover events wouldn't fire.
 			img.addClass('maphilighted');
 		});
 	};
-	
+
 	$.fn.maphilight.defaults = {
 		fill: true,
 		fillColor: '000000',
 		fillOpacity: 0.2,
+
 		stroke: true,
 		strokeColor: 'ff0000',
 		strokeOpacity: 1,
 		strokeWidth: 1,
+
 		fade: true,
 		alwaysOn: false,
 		neverOn: false,
 		groupBy: false,
 		wrapClass: true,
-		// plenty of shadow:
+
 		shadow: false,
 		shadowX: 0,
 		shadowY: 0,
@@ -340,7 +458,15 @@
 		shadowColor: '000000',
 		shadowOpacity: 0.8,
 		shadowPosition: 'outside',
-		shadowFrom: false
+		shadowFrom: false,
+
+		text: true,
+		textFontFamily: 'Arial',
+		textFontSize: '10px',
+		textColor: '000000',
+		textBaseline: 'middle',
+		textAlign: "center",
+		textFit: false
 	};
-	
+
 })(jQuery);
