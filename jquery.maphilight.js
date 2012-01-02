@@ -1,90 +1,89 @@
-(function($) {
+(function ($) {
 	var has_VML = document.namespaces,
-		has_canvas = !! document.createElement('canvas').getContext,
+		has_canvas = !!document.createElement('canvas').getContext,
 		create_canvas_for, add_shape_to, clear_canvas, shape_from_area, canvas_style, hex_to_decimal, css3color, is_image_loaded, options_from_area;
 
 	if (!(has_canvas || has_VML)) {
-		$.fn.maphilight = function() {
+		$.fn.maphilight = function () {
 			return this;
 		};
 		return;
 	}
 
+	var calculateBoundaries = function (shape, coords) {
+		var boundary = {
+			x: 0,
+			y: 0,
+			width: 0,
+			height: 0
+		};
+		switch (shape) {
+			case 'rect':
+				boundary.x = coords[0];
+				boundary.y = coords[1];
+				boundary.width = coords[2] - boundary.x;
+				boundary.height = coords[3] - boundary.y;
+				break;
+			case 'poly':
+				var xLow = coords[0],
+				xHigh = coords[0],
+				yLow = coords[1],
+				yHigh = coords[1];
+				for (var i = 2; i < coords.length; i += 2) {
+					xLow = Math.min(xLow, coords[i]);
+					xHigh = Math.max(xHigh, coords[i]);
+					yLow = Math.min(yLow, coords[i + 1]);
+					yHigh = Math.max(yHigh, coords[i + 1]);
+				}
+				boundary.x = xLow;
+				boundary.y = yLow;
+				boundary.width = xHigh - boundary.x;
+				boundary.height = yHigh - boundary.y;
+				break;
+			case 'circ':
+				boundary.x = coords[0] - coords[2];
+				boundary.y = coords[1] - coords[2];
+				boundary.width = boundary.height = coords[2] * 2;
+				break;
+		}
+		return boundary;
+	};
+
 	if (has_canvas) {
-		hex_to_decimal = function(hex) {
+		hex_to_decimal = function (hex) {
 			return Math.max(0, Math.min(parseInt(hex, 16), 255));
 		};
-		css3color = function(color, opacity) {
+		css3color = function (color, opacity) {
 			return 'rgba(' + hex_to_decimal(color.substr(0, 2)) + ',' + hex_to_decimal(color.substr(2, 2)) + ',' + hex_to_decimal(color.substr(4, 2)) + ',' + opacity + ')';
 		};
-		create_canvas_for = function(img) {
+		create_canvas_for = function (img) {
 			var c = $('<canvas style="width:' + img.width + 'px;height:' + img.height + 'px;"></canvas>').get(0);
 			c.getContext("2d").clearRect(0, 0, c.width, c.height);
 			return c;
 		};
 
-		var draw_shape = function(context, shape, coords, x_shift, y_shift) {
-				x_shift = x_shift || 0;
-				y_shift = y_shift || 0;
-				context.beginPath();
-				if (shape == 'rect') {
-					// x, y, width, height
-					context.rect(coords[0] + x_shift, coords[1] + y_shift, coords[2] - coords[0], coords[3] - coords[1]);
+		var draw_shape = function (context, shape, coords, x_shift, y_shift) {
+			x_shift = x_shift || 0;
+			y_shift = y_shift || 0;
+			context.beginPath();
+			if (shape == 'rect') {
+				// x, y, width, height
+				context.rect(coords[0] + x_shift, coords[1] + y_shift, coords[2] - coords[0], coords[3] - coords[1]);
+			}
+			else if (shape == 'poly') {
+				context.moveTo(coords[0] + x_shift, coords[1] + y_shift);
+				for (var i = 2; i < coords.length; i += 2) {
+					context.lineTo(coords[i] + x_shift, coords[i + 1] + y_shift);
 				}
-				else if (shape == 'poly') {
-					context.moveTo(coords[0] + x_shift, coords[1] + y_shift);
-					for (var i = 2; i < coords.length; i += 2) {
-						context.lineTo(coords[i] + x_shift, coords[i + 1] + y_shift);
-					}
-				}
-				else if (shape == 'circ') {
-					// x, y, radius, startAngle, endAngle, anticlockwise
-					context.arc(coords[0] + x_shift, coords[1] + y_shift, coords[2], 0, Math.PI * 2, false);
-				}
-				context.closePath();
-			};
+			}
+			else if (shape == 'circ') {
+				// x, y, radius, startAngle, endAngle, anticlockwise
+				context.arc(coords[0] + x_shift, coords[1] + y_shift, coords[2], 0, Math.PI * 2, false);
+			}
+			context.closePath();
+		};
 
-
-		var calculateCenter = function(shape, coords) {
-				var boundary = {
-					x: 0,
-					y: 0,
-					width: 0,
-					height: 0
-				};
-				switch (shape) {
-				case 'rect':
-					boundary.x = coords[0];
-					boundary.y = coords[1];
-					boundary.width = coords[2] - boundary.x;
-					boundary.height = coords[3] - boundary.y;
-					break;
-				case 'poly':
-					var xLow = coords[0],
-						xHigh = coords[0],
-						yLow = coords[1],
-						yHigh = coords[1];
-					for (var i = 2; i < coords.length; i += 2) {
-						xLow = Math.min(xLow, coords[i]);
-						xHigh = Math.max(xHigh, coords[i]);
-						yLow = Math.min(yLow, coords[i + 1]);
-						yHigh = Math.max(yHigh, coords[i + 1]);
-					}
-					boundary.x = xLow;
-					boundary.y = yLow;
-					boundary.width = xHigh - boundary.x;
-					boundary.height = yHigh - boundary.y;
-					break;
-				case 'circ':
-					boundary.x = coords[0] - coords[2];
-					boundary.y = coords[1] - coords[2];
-					boundary.width = boundary.height = coords[2] * 2;
-					break;
-				}
-				return boundary;
-			};
-
-		add_shape_to = function(canvas, shape, coords, options) {
+		add_shape_to = function (canvas, shape, coords, options) {
 			var context = canvas.getContext('2d');
 			// Because I don't want to worry about setting things back to a base state
 			// Shadow has to happen first, since it's on the bottom, and it does some clip /
@@ -155,7 +154,7 @@
 			}
 			// After all painting we put text above it.
 			if (options.text) {
-				var textCoordinates = calculateCenter(shape, coords),
+				var textCoordinates = calculateBoundaries(shape, coords),
 					offsetX = textCoordinates.x,
 					offsetY = textCoordinates.y,
 					sentences = options.text.split("\\n"),
@@ -223,17 +222,19 @@
 				}, 100);
 			}
 		};
-		clear_canvas = function(canvas) {
+		clear_canvas = function (canvas) {
 			canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
 		};
 	}
 	else { // ie executes this code
-		create_canvas_for = function(img) {
+		create_canvas_for = function (img) {
 			return $('<var style="zoom:1;overflow:hidden;display:block;width:' + img.width + 'px;height:' + img.height + 'px;"></var>').get(0);
 		};
 
-		add_shape_to = function(canvas, shape, coords, options, name) {
-			var e, fill = '<v:fill color="#' + options.fillColor + '" opacity="' + (options.fill ? options.fillOpacity : 0) + '" />',
+		add_shape_to = function (canvas, shape, coords, options, name) {
+			var e,
+				txt = "",
+				fill = '<v:fill color="#' + options.fillColor + '" opacity="' + (options.fill ? options.fillOpacity : 0) + '" />',
 				stroke = (options.stroke ? 'strokeweight="' + options.strokeWidth + '" stroked="t" strokecolor="#' + options.strokeColor + '"' : 'stroked="f"'),
 				opacity = '<v:stroke opacity="' + options.strokeOpacity + '"/>';
 
@@ -246,16 +247,24 @@
 			else if (shape == 'circ') {
 				e = $('<v:oval name="' + name + '" filled="t" ' + stroke + ' style="zoom:1;margin:0;padding:0;display:block;position:absolute;left:' + (coords[0] - coords[2]) + 'px;top:' + (coords[1] - coords[2]) + 'px;width:' + (coords[2] * 2) + 'px;height:' + (coords[2] * 2) + 'px;"></v:oval>');
 			}
-			e.get(0).innerHTML = fill + opacity;
-			$(canvas).append(e);
+
+			if (options.text) {
+				var textCoordinates = calculateBoundaries(shape, coords);
+				txt = '<v:text style="zoom:1;text-align:' + options.textAlign + ';font:' + options.textFontSize + options.textFontFamily + ';color:' + "#" + options.textColor + ';margin:0;padding:0;display:block;position:relative;left:' + 0 + 'px;top:' + 0 + 'px;width:' + textCoordinates.width + 'px;height:' + textCoordinates.height + 'px;"><table cellpadding="0" cellspacing="0" style="width:100%;height:100%;"><tr><td style="vertical-align:' + options.textBaseline + '">' + options.text.replace(/\\n/g, "<br/>") + '</td></tr></table></v:textbox>';
+			}
+
+			if (e) {
+				e.get(0).innerHTML = fill + opacity + txt;
+				$(canvas).append(e);
+			}
 		};
 
-		clear_canvas = function(canvas) {
+		clear_canvas = function (canvas) {
 			$(canvas).find('[name=highlighted]').remove();
 		};
 	}
 
-	shape_from_area = function(area) {
+	shape_from_area = function (area) {
 		var i, coords = area.getAttribute('coords').split(',');
 		for (i = 0; i < coords.length; i++) {
 			coords[i] = parseFloat(coords[i]);
@@ -263,19 +272,25 @@
 		return [area.getAttribute('shape').toLowerCase().substr(0, 4), coords];
 	};
 
-	options_from_area = function(area, options) {
+	options_from_area = function (area, options) {
 		var $area = $(area),
 			opts = $.extend({}, options, $.metadata ? $area.metadata() : false, $area.data('maphilight'));
 		if (opts.text !== false && typeof opts.text !== "string") {
 			opts.text = area.title;
 			if (opts.text === "") {
-				opts.text = false;
+				opts.text = area.alt;
+				if (opts.text === "") {
+					opts.text = area.name;
+					if (opts.text === "") {
+						opts.text = false;
+					}
+				}
 			}
 		}
 		return opts;
 	};
 
-	is_image_loaded = function(img) {
+	is_image_loaded = function (img) {
 		if (!img.complete) { // IE
 			return false;
 		}
@@ -295,26 +310,26 @@
 
 	var ie_hax_done = false;
 
-	$.fn.maphilight = function(opts) {
+	$.fn.maphilight = function (opts) {
 		opts = $.extend({}, $.fn.maphilight.defaults, opts);
 
 		if (!has_canvas && $.browser.msie && !ie_hax_done) {
-			document.namespaces.add("v", "urn:schemas-microsoft-com:vml");
+			document.namespaces.add("v", "urn:schemas-microsoft-com:vml", "#default#VML");
 			var style = document.createStyleSheet();
-			var shapes = ['shape', 'rect', 'oval', 'circ', 'fill', 'stroke', 'imagedata', 'group', 'textbox'];
-			$.each(shapes, function() {
+			var shapes = ['shape', 'rect', 'oval', 'circ', 'fill', 'stroke', 'imagedata', 'group', 'textbox', 'text'];
+			$.each(shapes, function () {
 				style.addRule('v\\:' + this, "behavior: url(#default#VML); antialias:true");
 			});
 			ie_hax_done = true;
 		}
 
-		return this.each(function() {
+		return this.each(function () {
 			var img = $(this),
 				wrap, options, map, canvas, canvas_always, mouseover, usemap;
 
 			if (!is_image_loaded(this)) {
 				// If the image isn't fully loaded, this won't work right.  Try again later.
-				return window.setTimeout(function() {
+				return window.setTimeout(function () {
 					img.maphilight(opts);
 				}, 200);
 			}
@@ -363,7 +378,7 @@
 			canvas.height = this.height;
 			canvas.width = this.width;
 
-			mouseover = function() {
+			mouseover = function () {
 				var shape, area_options;
 				area_options = options_from_area(this, options);
 				if (!area_options.neverOn && !area_options.alwaysOn) {
@@ -379,7 +394,7 @@
 							areas = map.find(area_options.groupBy);
 						}
 						var first = this;
-						areas.each(function() {
+						areas.each(function () {
 							if (this != first) {
 								var subarea_options = options_from_area(this, options);
 								if (!subarea_options.neverOn && !subarea_options.alwaysOn) {
@@ -396,7 +411,7 @@
 				}
 			};
 
-			map.bind('alwaysOn.maphilight', function() {
+			map.bind('alwaysOn.maphilight', function () {
 				// Check for areas with alwaysOn set. These are added to a *second* canvas,
 				// which will get around flickering during fading.
 				if (canvas_always) {
@@ -405,7 +420,7 @@
 				if (!has_canvas) {
 					$(canvas).empty();
 				}
-				map.find('area[coords]').each(function() {
+				map.find('area[coords]').each(function () {
 					var shape, area_options;
 					area_options = options_from_area(this, options);
 					if (area_options.alwaysOn) {
@@ -426,8 +441,12 @@
 						}
 					}
 				});
+				// workaround for IE7, IE8 not rendering the final rectangle
+				if (!has_canvas) {
+					$(canvas).append('<v:rect></v:rect>');
+				}
 			});
-			map.trigger('alwaysOn.maphilight').find('area[coords]').bind('mouseover.maphilight', mouseover).bind('mouseout.maphilight', function() {
+			map.trigger('alwaysOn.maphilight').find('area[coords]').bind('mouseover.maphilight', mouseover).bind('mouseout.maphilight', function () {
 				clear_canvas(canvas);
 			});
 			img.before(canvas); // if we put this after, the mouseover events wouldn't fire.
