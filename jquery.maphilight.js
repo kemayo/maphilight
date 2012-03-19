@@ -298,7 +298,7 @@
 					area_options = options_from_area(this, options);
 					if(area_options.alwaysOn) {
 						if(!canvas_always && has_canvas) {
-							canvas_always = create_canvas_for(img.get());
+							canvas_always = create_canvas_for(img.get(0));
 							$(canvas_always).css(canvas_style);
 							canvas_always.width = img.width();
 							canvas_always.height = img.height();
