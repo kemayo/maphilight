@@ -164,7 +164,7 @@
 	
 	is_image_loaded = function(img) {
 		if(!img.complete) { return false; } // IE
-		if(typeof img.naturalWidth != "undefined" && img.naturalWidth == 0) { return false; } // Others
+		if(typeof img.naturalWidth != "undefined" && img.naturalWidth === 0) { return false; } // Others
 		return true;
 	};
 
@@ -261,8 +261,8 @@
 					if(area_options.groupBy) {
 						var areas;
 						// two ways groupBy might work; attribute and selector
-						if(/^[a-zA-Z][-a-zA-Z]+$/.test(area_options.groupBy)) {
-							areas = map.find('area['+area_options.groupBy+'="'+$(this).attr(area_options.groupBy)+'"]')
+						if(/^[a-zA-Z][\-a-zA-Z]+$/.test(area_options.groupBy)) {
+							areas = map.find('area['+area_options.groupBy+'="'+$(this).attr(area_options.groupBy)+'"]');
 						} else {
 							areas = map.find(area_options.groupBy);
 						}
@@ -288,7 +288,7 @@
 				// Check for areas with alwaysOn set. These are added to a *second* canvas,
 				// which will get around flickering during fading.
 				if(canvas_always) {
-					clear_canvas(canvas_always)
+					clear_canvas(canvas_always);
 				}
 				if(!has_canvas) {
 					$(canvas).empty();
@@ -300,8 +300,8 @@
 						if(!canvas_always && has_canvas) {
 							canvas_always = create_canvas_for(img[0]);
 							$(canvas_always).css(canvas_style);
-							canvas_always.width = img[0].width
-							canvas_always.height = img[0].height
+							canvas_always.width = img[0].width;
+							canvas_always.height = img[0].height;
 							img.before(canvas_always);
 						}
 						area_options.fade = area_options.alwaysOnFade; // alwaysOn shouldn't fade in initially
@@ -317,7 +317,7 @@
 			
 			$(map).trigger('alwaysOn.maphilight').find('area[coords]')
 				.bind('mouseover.maphilight', mouseover)
-				.bind('mouseout.maphilight', function(e) { clear_canvas(canvas); });;
+				.bind('mouseout.maphilight', function(e) { clear_canvas(canvas); });
 			
 			img.before(canvas); // if we put this after, the mouseover events wouldn't fire.
 			
