@@ -211,7 +211,7 @@
 
 			map = $('map[name="'+usemap.substr(1)+'"]');
 
-			if(!(img.is('img') && usemap && map.size() > 0)) {
+			if(!(img.is('img,input[type="image"]') && usemap && map.size() > 0)) {
 				return;
 			}
 
