@@ -182,6 +182,13 @@
           });
         
         });
+      } else {
+        // If no specific options are defined, use default for all options
+        jQuery.each(defaultOptions, function(indexDefault, valueDefault) {
+          if (options[indexDefault] != valueDefault) {
+            options[indexDefault] = valueDefault;
+          }
+        });
       }
     }
     return $.extend({}, options, $.metadata ? $area.metadata() : false, $area.data('maphilight'));
@@ -218,10 +225,10 @@
       var style = document.createStyleSheet();
       var shapes = ['shape','rect', 'oval', 'circ', 'fill', 'stroke', 'imagedata', 'group','textbox'];
       $.each(shapes,
-        function() {
-          style.addRule('v\\:' + this, "behavior: url(#default#VML); antialias:true");
-        }
-        );
+      function() {
+        style.addRule('v\\:' + this, "behavior: url(#default#VML); antialias:true");
+      }
+    );
       ie_hax_done = true;
     }
 		
@@ -290,7 +297,7 @@
           !area_options.neverOn
           &&
           !area_options.alwaysOn
-          ) {
+      ) {
           shape = shape_from_area(this);
           add_shape_to(canvas, shape[0], shape[1], area_options, "highlighted");
           if(area_options.groupBy) {
