@@ -209,6 +209,10 @@
 			// So use raw getAttribute instead.
 			usemap = img.get(0).getAttribute('usemap');
 
+			if (!usemap) {
+				return
+			}
+
 			map = $('map[name="'+usemap.substr(1)+'"]');
 
 			if(!(img.is('img,input[type="image"]') && usemap && map.size() > 0)) {
