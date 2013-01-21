@@ -2,8 +2,16 @@
 	var has_VML, has_canvas, create_canvas_for, add_shape_to, clear_canvas, shape_from_area,
 		canvas_style, hex_to_decimal, css3color, is_image_loaded, options_from_area;
 
-	has_VML = document.namespaces;
 	has_canvas = !!document.createElement('canvas').getContext;
+
+	// VML: more complex
+	has_VML = (function() {
+		var a = document.createElement('div');
+		a.innerHTML = '<v:shape id="vml_flag1" adj="1" />';
+		var b = a.firstChild;
+		b.style.behavior = "url(#default#VML)";
+		return b ? typeof b.adj == "object": true;
+	})();
 
 	if(!(has_canvas || has_VML)) {
 		$.fn.maphilight = function() { return this; };
@@ -180,7 +188,7 @@
 	$.fn.maphilight = function(opts) {
 		opts = $.extend({}, $.fn.maphilight.defaults, opts);
 		
-		if(!has_canvas && $.browser.msie && !ie_hax_done) {
+		if(has_VML && !ie_hax_done) {
 			document.namespaces.add("v", "urn:schemas-microsoft-com:vml");
 			var style = document.createStyleSheet();
 			var shapes = ['shape','rect', 'oval', 'circ', 'fill', 'stroke', 'imagedata', 'group','textbox'];
@@ -244,7 +252,7 @@
 				}
 			}
 			img.before(wrap).css('opacity', 0).css(canvas_style).remove();
-			if($.browser.msie) { img.css('filter', 'Alpha(opacity=0)'); }
+			if(has_VML) { img.css('filter', 'Alpha(opacity=0)'); }
 			wrap.append(img);
 			
 			canvas = create_canvas_for(this);
