@@ -188,7 +188,7 @@
 	$.fn.maphilight = function(opts) {
 		opts = $.extend({}, $.fn.maphilight.defaults, opts);
 		
-		if(has_VML && !ie_hax_done) {
+		if(!has_canvas && !ie_hax_done) {
 			document.namespaces.add("v", "urn:schemas-microsoft-com:vml");
 			var style = document.createStyleSheet();
 			var shapes = ['shape','rect', 'oval', 'circ', 'fill', 'stroke', 'imagedata', 'group','textbox'];
