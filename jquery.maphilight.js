@@ -189,14 +189,16 @@
 		opts = $.extend({}, $.fn.maphilight.defaults, opts);
 		
 		if(!has_canvas && !ie_hax_done) {
-			document.namespaces.add("v", "urn:schemas-microsoft-com:vml");
-			var style = document.createStyleSheet();
-			var shapes = ['shape','rect', 'oval', 'circ', 'fill', 'stroke', 'imagedata', 'group','textbox'];
-			$.each(shapes,
-				function() {
-					style.addRule('v\\:' + this, "behavior: url(#default#VML); antialias:true");
-				}
-			);
+			$(window).ready(function() {
+				document.namespaces.add("v", "urn:schemas-microsoft-com:vml");
+				var style = document.createStyleSheet();
+				var shapes = ['shape','rect', 'oval', 'circ', 'fill', 'stroke', 'imagedata', 'group','textbox'];
+				$.each(shapes,
+					function() {
+						style.addRule('v\\:' + this, "behavior: url(#default#VML); antialias:true");
+					}
+				);
+			});
 			ie_hax_done = true;
 		}
 		
