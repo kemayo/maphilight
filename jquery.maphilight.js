@@ -155,7 +155,10 @@
 			$(canvas).append(e);
 		};
 		clear_canvas = function(canvas) {
-			$(canvas).find('[name=highlighted]').remove();
+			// jquery1.8 + ie7 
+			var $html = $("<div>" + canvas.innerHTML + "</div>");
+			$html.children('[name=highlighted]').remove();
+			canvas.innerHTML = $html.html();
 		};
 	}
 	
