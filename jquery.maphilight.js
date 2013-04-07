@@ -141,6 +141,7 @@
 		};
 		add_shape_to = function(canvas, shape, coords, options, name) {
 			var fill, stroke, opacity, e;
+			for (var i in coords) coords[i] = parseInt(coords[i]);
 			fill = '<v:fill color="#'+options.fillColor+'" opacity="'+(options.fill ? options.fillOpacity : 0)+'" />';
 			stroke = (options.stroke ? 'strokeweight="'+options.strokeWidth+'" stroked="t" strokecolor="#'+options.strokeColor+'"' : 'stroked="f"');
 			opacity = '<v:stroke opacity="'+options.strokeOpacity+'"/>';
