@@ -1,0 +1,16 @@
+{
+  "name": "maphilight",
+  "version": "1.2.2",
+  "main": "jquery.maphilight.js",
+  "ignore": [
+    "**/.*",
+    "docs",
+    "tools",
+    "package.json"
+  ],
+  "dependencies": {
+    "jquery": "~1.7.2"
+  },
+  "devDependencies": {
+  }
+}
