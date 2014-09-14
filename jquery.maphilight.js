@@ -26,8 +26,8 @@
 			return 'rgba('+hex_to_decimal(color.substr(0,2))+','+hex_to_decimal(color.substr(2,2))+','+hex_to_decimal(color.substr(4,2))+','+opacity+')';
 		};
 		create_canvas_for = function(img) {
-			var c = $('<canvas style="width:'+img.width+'px;height:'+img.height+'px;"></canvas>').get(0);
-			c.getContext("2d").clearRect(0, 0, c.width, c.height);
+			var c = $('<canvas style="width:'+$(img).width()+'px;height:'+$(img).height()+'px;"></canvas>').get(0);
+			c.getContext("2d").clearRect(0, 0, $(img).width(), $(img).height());
 			return c;
 		};
 		var draw_shape = function(context, shape, coords, x_shift, y_shift) {
