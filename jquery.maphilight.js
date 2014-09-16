@@ -131,6 +131,7 @@
 			if(options.fade) {
 				$(canvas).css('opacity', 0).animate({opacity: 1}, 100);
 			}
+			return context;
 		};
 		clear_canvas = function(canvas) {
 			canvas.getContext('2d').clearRect(0, 0, canvas.width,canvas.height);
@@ -267,7 +268,7 @@
 			canvas.width = this.width;
 			
 			mouseover = function(e) {
-				var shape, area_options;
+				var shape, area_options, context;
 				area_options = options_from_area(this, options);
 				if(
 					!area_options.neverOn
@@ -275,7 +276,10 @@
 					!area_options.alwaysOn
 				) {
 					shape = shape_from_area(this);
-					add_shape_to(canvas, shape[0], shape[1], area_options, "highlighted");
+					context = add_shape_to(canvas, shape[0], shape[1], area_options, "highlighted");
+					if (options.callback) {
+						options.callback(this, shape, context);
+					}
 					if(area_options.groupBy) {
 						var areas;
 						// two ways groupBy might work; attribute and selector
