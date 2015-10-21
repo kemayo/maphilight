@@ -48,7 +48,7 @@
 				context.arc(coords[0] + x_shift, coords[1] + y_shift, coords[2], 0, Math.PI * 2, false);
 			}
 			context.closePath();
-		}
+		};
 		add_shape_to = function(canvas, shape, coords, options, name) {
 			var i, context = canvas.getContext('2d');
 			
@@ -224,7 +224,7 @@
 			usemap = img.get(0).getAttribute('usemap');
 
 			if (!usemap) {
-				return
+				return;
 			}
 
 			map = $('map[name="'+usemap.substr(1)+'"]');
@@ -269,11 +269,7 @@
 			mouseover = function(e) {
 				var shape, area_options;
 				area_options = options_from_area(this, options);
-				if(
-					!area_options.neverOn
-					&&
-					!area_options.alwaysOn
-				) {
+				if(!area_options.neverOn && !area_options.alwaysOn) {
 					shape = shape_from_area(this);
 					add_shape_to(canvas, shape[0], shape[1], area_options, "highlighted");
 					if(area_options.groupBy) {
@@ -300,7 +296,7 @@
 						$(canvas).append('<v:rect></v:rect>');
 					}
 				}
-			}
+			};
 
 			$(map).bind('alwaysOn.maphilight', function() {
 				// Check for areas with alwaysOn set. These are added to a *second* canvas,

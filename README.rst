@@ -11,3 +11,21 @@ tested in Firefox, IE, Safari, Chrome, and Opera.
 
 Documentation is included in the ``docs`` directory, or can be found
 at http://davidlynch.org/js/maphilight/docs/
+
+Development
+-----------
+
+If you want to make changes to Maphilight, check out the repository and
+then do:
+
+``> npm install``
+
+Before submitting a pull request, make sure you've run
+
+``> grunt lint``
+
+and fixed any errors it reports.
+
+To regenerate the minified version, you can run
+
+``> grunt build``
