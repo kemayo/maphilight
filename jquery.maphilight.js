@@ -207,7 +207,7 @@
 		}
 		
 		return this.each(function() {
-			var img, wrap, options, map, canvas, canvas_always, mouseover, highlighted_shape, usemap;
+			var img, wrap, options, map, canvas, canvas_always, highlighted_shape, usemap;
 			img = $(this);
 
 			if(!is_image_loaded(this)) {
@@ -239,12 +239,13 @@
 				var wrapper = img.parent();
 				img.insertBefore(wrapper);
 				wrapper.remove();
-				$(map).unbind('.maphilight').find('area[coords]').unbind('.maphilight');
+				$(map).unbind('.maphilight');
 			}
 
 			wrap = $('<div></div>').css({
 				display:'block',
-				background:'url("'+this.src+'")',
+				backgroundImage:'url("'+this.src+'")',
+				backgroundSize:'contain',
 				position:'relative',
 				padding:0,
 				width:this.width,
@@ -266,38 +267,6 @@
 			canvas.height = this.height;
 			canvas.width = this.width;
 			
-			mouseover = function(e) {
-				var shape, area_options;
-				area_options = options_from_area(this, options);
-				if(!area_options.neverOn && !area_options.alwaysOn) {
-					shape = shape_from_area(this);
-					add_shape_to(canvas, shape[0], shape[1], area_options, "highlighted");
-					if(area_options.groupBy) {
-						var areas;
-						// two ways groupBy might work; attribute and selector
-						if(/^[a-zA-Z][\-a-zA-Z]+$/.test(area_options.groupBy)) {
-							areas = map.find('area['+area_options.groupBy+'="'+$(this).attr(area_options.groupBy)+'"]');
-						} else {
-							areas = map.find(area_options.groupBy);
-						}
-						var first = this;
-						areas.each(function() {
-							if(this != first) {
-								var subarea_options = options_from_area(this, options);
-								if(!subarea_options.neverOn && !subarea_options.alwaysOn) {
-									var shape = shape_from_area(this);
-									add_shape_to(canvas, shape[0], shape[1], subarea_options, "highlighted");
-								}
-							}
-						});
-					}
-					// workaround for IE7, IE8 not rendering the final rectangle in a group
-					if(!has_canvas) {
-						$(canvas).append('<v:rect></v:rect>');
-					}
-				}
-			};
-
 			$(map).bind('alwaysOn.maphilight', function() {
 				// Check for areas with alwaysOn set. These are added to a *second* canvas,
 				// which will get around flickering during fading.
@@ -327,11 +296,38 @@
 						}
 					}
 				});
-			});
-			
-			$(map).trigger('alwaysOn.maphilight').find('area[coords]')
-				.bind('mouseover.maphilight, focus.maphilight', mouseover)
-				.bind('mouseout.maphilight, blur.maphilight', function(e) { clear_canvas(canvas); });
+			}).trigger('alwaysOn.maphilight')
+			.bind('mouseover.maphilight, focus.maphilight', function(e) {
+				var shape, area_options, area = e.target;
+				area_options = options_from_area(area, options);
+				if(!area_options.neverOn && !area_options.alwaysOn) {
+					shape = shape_from_area(area);
+					add_shape_to(canvas, shape[0], shape[1], area_options, "highlighted");
+					if(area_options.groupBy) {
+						var areas;
+						// two ways groupBy might work; attribute and selector
+						if(/^[a-zA-Z][\-a-zA-Z]+$/.test(area_options.groupBy)) {
+							areas = map.find('area['+area_options.groupBy+'="'+$(area).attr(area_options.groupBy)+'"]');
+						} else {
+							areas = map.find(area_options.groupBy);
+						}
+						var first = area;
+						areas.each(function() {
+							if(this != first) {
+								var subarea_options = options_from_area(this, options);
+								if(!subarea_options.neverOn && !subarea_options.alwaysOn) {
+									var shape = shape_from_area(this);
+									add_shape_to(canvas, shape[0], shape[1], subarea_options, "highlighted");
+								}
+							}
+						});
+					}
+					// workaround for IE7, IE8 not rendering the final rectangle in a group
+					if(!has_canvas) {
+						$(canvas).append('<v:rect></v:rect>');
+					}
+				}
+			}).bind('mouseout.maphilight, blur.maphilight', function(e) { clear_canvas(canvas); });
 			
 			img.before(canvas); // if we put this after, the mouseover events wouldn't fire.
 			
