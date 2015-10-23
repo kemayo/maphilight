@@ -1,6 +1,6 @@
 {
   "name": "maphilight",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "title": "maphilight",
   "author": {
     "name": "David Lynch",
@@ -22,7 +22,9 @@
     "map",
     "imagemap",
     "hilight",
-    "highlight"
+    "highlight",
+    "jquery-plugin",
+    "ecosystem:jquery"
   ],
   "homepage": "https://github.com/kemayo/maphilight",
   "devDependencies": {
