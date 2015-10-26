@@ -207,7 +207,7 @@
 		}
 		
 		return this.each(function() {
-			var img, wrap, options, map, canvas, canvas_always, highlighted_shape, usemap;
+			var img, wrap, options, map, canvas, canvas_always, highlighted_shape, usemap, imgSrc;
 			img = $(this);
 
 			if(!is_image_loaded(this)) {
@@ -242,9 +242,11 @@
 				$(map).unbind('.maphilight');
 			}
 
+			//Formating the image source. IE > 9 has issue with new line characters
+            imgSrc = this.src.replace(/[\n\r]/g, '');
 			wrap = $('<div></div>').css({
 				display:'block',
-				backgroundImage:'url("'+this.src+'")',
+				backgroundImage:'url("'+imgSrc+'")',
 				backgroundSize:'contain',
 				position:'relative',
 				padding:0,
