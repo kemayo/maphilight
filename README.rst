@@ -28,4 +28,4 @@ and fixed any errors it reports.
 
 To regenerate the minified version, you can run
 
-``> grunt build``
+``> grunt``
