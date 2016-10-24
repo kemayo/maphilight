@@ -1,6 +1,9 @@
 ==========
 Maphilight
 ==========
+.. image:: https://img.shields.io/cdnjs/v/maphilight.svg
+  :alt: CDNJS 
+  :target: https://cdnjs.com/libraries/maphilight
 
 Maphilight is a jQuery plugin that adds visual hilights to image maps.
 
