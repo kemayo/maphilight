@@ -264,6 +264,8 @@
 					wrap.addClass(options.wrapClass);
 				}
 			}
+			// Firefox has a bug that prevents tabbing into the image map if
+			// we set opacity of the image to 0, but very nearly 0 works!
 			img.before(wrap).css('opacity', 0.0000000001).css(canvas_style).remove();
 			if(has_VML) { img.css('filter', 'Alpha(opacity=0)'); }
 			wrap.append(img);
