@@ -264,7 +264,7 @@
 					wrap.addClass(options.wrapClass);
 				}
 			}
-			img.before(wrap).css('opacity', 0).css(canvas_style).remove();
+			img.before(wrap).css('opacity', 0.0000000001).css(canvas_style).remove();
 			if(has_VML) { img.css('filter', 'Alpha(opacity=0)'); }
 			wrap.append(img);
 
