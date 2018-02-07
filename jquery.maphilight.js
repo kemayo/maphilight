@@ -264,7 +264,9 @@
 					wrap.addClass(options.wrapClass);
 				}
 			}
-			img.before(wrap).css('opacity', 0).css(canvas_style).remove();
+			// Firefox has a bug that prevents tabbing into the image map if
+			// we set opacity of the image to 0, but very nearly 0 works!
+			img.before(wrap).css('opacity', 0.0000000001).css(canvas_style).remove();
 			if(has_VML) { img.css('filter', 'Alpha(opacity=0)'); }
 			wrap.append(img);
 
@@ -303,7 +305,7 @@
 					}
 				});
 			}).trigger('alwaysOn.maphilight')
-			.bind('mouseover.maphilight, focus.maphilight', function(e) {
+			.bind('mouseover.maphilight, focusin.maphilight', function(e) {
 				var shape, area_options, area = e.target;
 				area_options = options_from_area(area, options);
 				if(!area_options.neverOn && !area_options.alwaysOn) {
@@ -333,7 +335,7 @@
 						$(canvas).append('<v:rect></v:rect>');
 					}
 				}
-			}).bind('mouseout.maphilight, blur.maphilight', function(e) { clear_canvas(canvas); });
+			}).bind('mouseout.maphilight, focusout.maphilight', function(e) { clear_canvas(canvas); });
 
 			img.before(canvas); // if we put this after, the mouseover events wouldn't fire.
 
