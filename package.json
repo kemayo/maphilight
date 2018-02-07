@@ -15,7 +15,7 @@
     }
   ],
   "dependencies": {
-    "jquery": "1"
+    "jquery": "^3.0.0"
   },
   "description": "a plugin that adds visual hilights to image maps",
   "keywords": [
