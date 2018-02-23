@@ -29,8 +29,43 @@ import os
 import re
 import sys
 import xml.dom.minidom
-
+import math
+import string
 import parse_path
+
+def toStr(path, width_ratio, height_ratio):
+     smoothing = 2.9
+     minPixelSize = 8
+     minPolygonSides = 4
+     ret = '';
+     pw_ = 0
+     ph_ = 0
+     minW = 1000000
+     minH = 1000000
+     maxW = 0
+     maxH = 0
+     for p in path:
+         pw = p[0]*width_ratio
+         ph = p[1]*height_ratio
+         # if all of the fields are defined, and there is X difference between at least one value in the coordinate point from the prev
+         if (ph is not None and pw is not None and (math.fabs(pw_ - pw) > smoothing or math.fabs(ph_ - ph) > smoothing)):
+             if (len(ret) > 0):
+                 ret += " , "
+             ret += ("%d,%d" % (pw, ph))
+             pw_ = pw
+             ph_ = ph
+             if (pw > maxW):
+                 maxW = pw
+             if (ph > maxH):
+                 maxH = ph
+             if (pw < minW):
+                 minW = pw
+             if (ph < minH):
+                 minH = ph
+
+     if (len(string.split(ret,",")) > minPolygonSides*2+1 and ( math.fabs(maxH - minH) > minPixelSize or math.fabs(maxW - minW) > minPixelSize )):
+         return ret
+     return ""
 
 if len(sys.argv) == 1:
     sys.exit("svn2imagemap.py FILENAME [x y [group1 group2 ... groupN]]")
@@ -46,8 +81,11 @@ if len(sys.argv) >= 3:
 svg_file = xml.dom.minidom.parse(sys.argv[1])
 svg = svg_file.getElementsByTagName('svg')[0]
 
-raw_width = float(svg.getAttribute('width'))
-raw_height = float(svg.getAttribute('height'))
+non_decimal = re.compile(r'[^\d.]+')
+make_decimal = lambda x: non_decimal.sub('', x)
+
+raw_width = float(make_decimal(svg.getAttribute('width')))
+raw_height = float(make_decimal(svg.getAttribute('height')))
 width_ratio = x and (x / raw_width) or 1
 height_ratio = y and (y / raw_height) or 1
 
@@ -62,9 +100,12 @@ for e in elements:
     paths = []
     if e.nodeName == 'g':
         for path in e.getElementsByTagName('path'):
+            gelem = path.parentNode
             points = parse_path.get_points(path.getAttribute('d'))
             for pointset in points:
-                paths.append([path.getAttribute('id'), pointset])
+                paths.append([path.getAttribute('id'), pointset, 
+                             gelem.getAttribute('title'), gelem.getAttribute('iso'),
+                             gelem.getAttribute('alt')])
     else:
         points = parse_path.get_points(e.getAttribute('d'))
         for pointset in points:
@@ -83,8 +124,12 @@ for e in elements:
 out = []
 for g in parsed_groups:
     for path in parsed_groups[g]:
-        out.append('<area href="#" title="%s" shape="poly" coords="%s"></area>' %
-            (path[0], ', '.join([("%d,%d" % (p[0]*width_ratio, p[1]*height_ratio)) for p in path[1]])))
+        coord = toStr(path[1],width_ratio,height_ratio)
+        if (coord != ''):
+            out.append('<@renderMap code="%s" coords="%s" title="%s" />' % (path[3],coord,path[2]))
 
 outfile = open(sys.argv[1].replace('.svg', '.html'), 'w')
 outfile.write('\n'.join(out))
+
+
+

@@ -253,6 +253,7 @@
 				backgroundImage:'url("'+this.src+'")',
 				backgroundSize:'contain',
 				position:'relative',
+				backgroundSize: this.width +"px " + this.height + "px",
 				padding:0,
 				width:this.width,
 				height:this.height
