@@ -305,7 +305,7 @@
 					}
 				});
 			}).trigger('alwaysOn.maphilight')
-			.bind('mouseover.maphilight, focusin.maphilight', function(e) {
+			.bind('mouseover.maphilight focusin.maphilight', function(e) {
 				var shape, area_options, area = e.target;
 				area_options = options_from_area(area, options);
 				if(!area_options.neverOn && !area_options.alwaysOn) {
@@ -335,7 +335,7 @@
 						$(canvas).append('<v:rect></v:rect>');
 					}
 				}
-			}).bind('mouseout.maphilight, focusout.maphilight', function(e) { clear_canvas(canvas); });
+			}).bind('mouseout.maphilight focusout.maphilight', function(e) { clear_canvas(canvas); });
 
 			img.before(canvas); // if we put this after, the mouseover events wouldn't fire.
 
