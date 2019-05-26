@@ -170,9 +170,15 @@
 	}
 
 	shape_from_area = function(area) {
-		var i, coords = area.getAttribute('coords').split(',');
+		var i, coords,
+			shape = (area.getAttribute('shape') || 'rect').toLowerCase().substr(0,4);
+		if (shape === 'defa') {
+			// 'default' doesn't really apply to what we're doing; it's the background state
+			return;
+		}
+		coords = (area.getAttribute('coords') || '').split(',');
 		for (i=0; i < coords.length; i++) { coords[i] = parseFloat(coords[i]); }
-		return [area.getAttribute('shape').toLowerCase().substr(0,4), coords];
+		return [shape, coords];
 	};
 
 	options_from_area = function(area, options) {
@@ -299,6 +305,9 @@
 						}
 						area_options.fade = area_options.alwaysOnFade; // alwaysOn shouldn't fade in initially
 						shape = shape_from_area(this);
+						if (!shape) {
+							return;
+						}
 						if (has_canvas) {
 							add_shape_to(canvas_always, shape[0], shape[1], area_options, "");
 						} else {
@@ -312,6 +321,9 @@
 				area_options = options_from_area(area, options);
 				if(!area_options.neverOn && !area_options.alwaysOn) {
 					shape = shape_from_area(area);
+					if (!shape) {
+						return;
+					}
 					add_shape_to(canvas, shape[0], shape[1], area_options, "highlighted");
 					if(area_options.groupBy) {
 						var areas;
