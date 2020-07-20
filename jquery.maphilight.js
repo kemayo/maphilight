@@ -258,8 +258,8 @@
             imgSrc = this.src.replace(/[\n\r]/g, '');
 			wrap = $('<div></div>').css({
 				display:'block',
-				backgroundImage:'url("'+imgSrc+'")',
-				backgroundSize:'contain',
+				background:'url("'+this.src+'")',
+				backgroundSize: this.width + 'px ' + this.height + 'px',
 				position:'relative',
 				padding:0,
 				width:this.width,
