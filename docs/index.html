@@ -4,8 +4,6 @@
 <head>
 	<title>jQuery maphilight documentation</title>
 	<script type="text/javascript" src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
-	<script type="text/javascript" src="ui.tabs.pack.js"></script>
-	<link rel="stylesheet" type="text/css" href="ui.tabs.css" />
 	<style type="text/css">
 	body {
 		width: 80%;
@@ -47,23 +45,10 @@
 	code {
 		font-family: "Courier New", Courier, monospace;
 	}
-	.ui-tabs-nav li {
-		border: 1px solid #97A5B0;
-		border-bottom: none;
-		background: #ddecf5;
-	}
-	li.ui-tabs-selected {
-		border: 2px solid #97A5B0;
-		border-bottom: none;
-		background: #fff;
-	}
 	.options dt, .methods dt {
 		background: #CFD4E6;
 	}
 	</style>
-	<script type="text/javascript">$(function() {
-		$('.tabs').tabs();
-	});</script>
 </head>
 <body>
 	<h1>jQuery maphilight documentation</h1>
@@ -85,10 +70,6 @@
 	<div>
 		<a name="maphilight"></a>
 		<h3><code>maphilight( [options] )</code></h3>
-		<ul class="tabs">
-			<li><a href="#overview">Overview</a></li>
-			<li><a href="#options">Options</a></li>
-		</ul>
 		<div id="overview">
 			<p>The method that adds hilight behavior to an imagemap.</p>
 			<h4>Arguments:</h4>
@@ -96,7 +77,7 @@
 				<dt><code>options</code> (optional)</dt>
 				<dd>
 					<p>A set of key/value pairs that configures the map.  All options are optional.</p>
-                    <p>All options can be overridden with the jQuery <code>data</code> method, per-<code>img</code> and per-<code>area</code>.</p>
+					<p>All options can be overridden with the jQuery <code>data</code> method, per-<code>img</code> and per-<code>area</code>.</p>
 					<p>The <a href="http://docs.jquery.com/Plugins/Metadata">metadata plugin</a> is also supported.</p>
 					<p>Order of inheritance:
 						<ol>
