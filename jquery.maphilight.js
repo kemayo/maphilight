@@ -1,9 +1,9 @@
 (function(root, factory) {
-    if (typeof define === 'function' && define.amd) {
-        define(['jquery'], factory);
-    } else {
-        factory(root.jQuery);
-    }
+	if (typeof define === 'function' && define.amd) {
+		define(['jquery'], factory);
+	} else {
+		factory(root.jQuery);
+	}
 })(this, function($) {
 	var has_VML, has_canvas, create_canvas_for, add_shape_to, clear_canvas, shape_from_area,
 		canvas_style, hex_to_decimal, css3color, is_image_loaded, options_from_area;
@@ -255,7 +255,7 @@
 			}
 
 			//Formating the image source. IE > 9 has issue with new line characters
-            imgSrc = this.src.replace(/[\n\r]/g, '');
+			imgSrc = this.src.replace(/[\n\r]/g, '');
 			wrap = $('<div></div>').css({
 				display:'block',
 				background:'url("'+this.src+'")',
