@@ -165,7 +165,7 @@
 			// jquery1.8 + ie7
 			var $html = $("<div>" + canvas.innerHTML + "</div>");
 			$html.children('[name=highlighted]').remove();
-			canvas.innerHTML = $html.html();
+			$(canvas).html($html.html());
 		};
 	}
 
