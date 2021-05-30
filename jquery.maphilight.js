@@ -326,22 +326,28 @@
 					}
 					add_shape_to(canvas, shape[0], shape[1], area_options, "highlighted");
 					if(area_options.groupBy) {
-						var areas;
-						// two ways groupBy might work; attribute and selector
-						if(/^[a-zA-Z][\-a-zA-Z]+$/.test(area_options.groupBy)) {
-							areas = map.find('area['+area_options.groupBy+'="'+$(area).attr(area_options.groupBy)+'"]');
-						} else {
-							areas = map.find(area_options.groupBy);
+						if(typeof area_options.groupBy == 'string') {
+							area_options.groupBy = [area_options.groupBy];
 						}
-						var first = area;
-						areas.each(function() {
-							if(this != first) {
-								var subarea_options = options_from_area(this, options);
-								if(!subarea_options.neverOn && !subarea_options.alwaysOn) {
-									var shape = shape_from_area(this);
-									add_shape_to(canvas, shape[0], shape[1], subarea_options, "highlighted");
-								}
+						var el = $(this);
+						$.each(area_options.groupBy, function(index, groupitem){
+							var areas;
+							// two ways groupBy might work; attribute and selector
+							if(/^[a-zA-Z][\-a-zA-Z]+$/.test(groupitem)) {
+								areas = map.find('area['+groupitem+'="'+el.attr(groupitem)+'"]');
+							} else {
+								areas = map.find(groupitem);
 							}
+							var first = this;
+							areas.each(function() {
+								if(this != first) {
+									var subarea_options = options_from_area(this, options);
+									if(!subarea_options.neverOn && !subarea_options.alwaysOn) {
+										var shape = shape_from_area(this);
+										add_shape_to(canvas, shape[0], shape[1], subarea_options, "highlighted");
+									}
+								}
+							});
 						});
 					}
 					// workaround for IE7, IE8 not rendering the final rectangle in a group
