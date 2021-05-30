@@ -260,6 +260,7 @@
 				display:'block',
 				background:'url("'+this.src+'")',
 				"background-size":'contain',
+				"background-repeat":'no-repeat',
 				position:'relative',
 				padding:0,
 				width:this.width,
