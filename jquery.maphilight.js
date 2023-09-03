@@ -245,6 +245,13 @@
 				return;
 			}
 
+			// Store the current width/height of the image here in case it's being sized by CSS that'll
+			// be affected by it being wrapped by the div below. (e.g. width:50%)
+			// For now, we'll trust that something else is handling scaling the <area>'s coords to account
+			// for this non-static sizing...
+			var currentWidth = img.width();
+			var currentHeight = img.height();
+			
 			if(img.hasClass('maphilighted')) {
 				// We're redrawing an old map, probably to pick up changes to the options.
 				// Just clear out all the old stuff.
@@ -263,8 +270,8 @@
 				"background-repeat":'no-repeat',
 				position:'relative',
 				padding:0,
-				width:this.width,
-				height:this.height
+				width:currentWidth,
+				height:currentHeight
 				});
 			if(options.wrapClass) {
 				if(options.wrapClass === true) {
@@ -281,8 +288,8 @@
 
 			canvas = create_canvas_for(this);
 			$(canvas).css(canvas_style);
-			canvas.height = this.height;
-			canvas.width = this.width;
+			canvas.height = currentHeight;
+			canvas.width = currentWidth;
 
 			$(map).bind('alwaysOn.maphilight', function() {
 				// Check for areas with alwaysOn set. These are added to a *second* canvas,
@@ -300,8 +307,8 @@
 						if(!canvas_always && has_canvas) {
 							canvas_always = create_canvas_for(img[0]);
 							$(canvas_always).css(canvas_style);
-							canvas_always.width = img[0].width;
-							canvas_always.height = img[0].height;
+							canvas_always.width = currentWidth;
+							canvas_always.height = currentHeight;
 							img.before(canvas_always);
 						}
 						area_options.fade = area_options.alwaysOnFade; // alwaysOn shouldn't fade in initially
