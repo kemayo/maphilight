@@ -183,7 +183,12 @@
 
 	options_from_area = function(area, options) {
 		var $area = $(area);
-		return $.extend({}, options, $.metadata ? $area.metadata() : false, $area.data('maphilight'));
+		var data = $.extend({}, $.metadata ? $area.metadata() : false, $area.data('maphilight'));
+		var isAlwaysOn = options.alwaysOn || (data ? data.alwaysOn : false);
+		return $.extend({}, options,
+			isAlwaysOn ? options.alwaysOnConfig : false,
+			data
+		);
 	};
 
 	is_image_loaded = function(img) {
@@ -380,6 +385,7 @@
 		strokeWidth: 1,
 		fade: true,
 		alwaysOn: false,
+		alwaysOnConfig: false,
 		neverOn: false,
 		groupBy: false,
 		wrapClass: true,
