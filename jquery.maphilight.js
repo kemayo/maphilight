@@ -5,12 +5,10 @@
 		factory(root.jQuery);
 	}
 })(this, function($) {
-	var has_VML, has_canvas, create_canvas_for, add_shape_to, clear_canvas, shape_from_area,
+	var create_canvas_for, add_shape_to, clear_canvas, shape_from_area,
 		canvas_style, hex_to_decimal, css3color, is_image_loaded, options_from_area;
 
-	has_canvas = !!document.createElement('canvas').getContext;
-
-	if(!has_canvas) {
+	if(!document.createElement('canvas').getContext) {
 		$.fn.maphilight = function() { return this; };
 		return;
 	}
@@ -173,20 +171,6 @@
 	$.fn.maphilight = function(opts) {
 		opts = $.extend({}, $.fn.maphilight.defaults, opts);
 
-		if(!has_canvas && !ie_hax_done) {
-			$(window).ready(function() {
-				document.namespaces.add("v", "urn:schemas-microsoft-com:vml");
-				var style = document.createStyleSheet();
-				var shapes = ['shape','rect', 'oval', 'circ', 'fill', 'stroke', 'imagedata', 'group','textbox'];
-				$.each(shapes,
-					function() {
-						style.addRule('v\\:' + this, "behavior: url(#default#VML); antialias:true");
-					}
-				);
-			});
-			ie_hax_done = true;
-		}
-
 		return this.each(function() {
 			var img, wrap, options, map, canvas, canvas_always, highlighted_shape, usemap, imgSrc;
 			img = $(this);
@@ -252,7 +236,6 @@
 			// Firefox has a bug that prevents tabbing into the image map if
 			// we set opacity of the image to 0, but very nearly 0 works!
 			img.before(wrap).css('opacity', 0.0000000001).css(canvas_style).remove();
-			if(has_VML) { img.css('filter', 'Alpha(opacity=0)'); }
 			wrap.append(img);
 
 			canvas = create_canvas_for(this);
@@ -266,14 +249,11 @@
 				if(canvas_always) {
 					clear_canvas(canvas_always);
 				}
-				if(!has_canvas) {
-					$(canvas).empty();
-				}
 				$(map).find('area[coords]').each(function() {
 					var shape, area_options;
 					area_options = options_from_area(this, options);
 					if(area_options.alwaysOn) {
-						if(!canvas_always && has_canvas) {
+						if(!canvas_always) {
 							canvas_always = create_canvas_for(img[0]);
 							$(canvas_always).css(canvas_style);
 							canvas_always.width = currentWidth;
@@ -285,11 +265,7 @@
 						if (!shape) {
 							return;
 						}
-						if (has_canvas) {
-							add_shape_to(canvas_always, shape[0], shape[1], area_options, "");
-						} else {
-							add_shape_to(canvas, shape[0], shape[1], area_options, "");
-						}
+						add_shape_to(canvas_always, shape[0], shape[1], area_options, "");
 					}
 				});
 			}).trigger('alwaysOn.maphilight')
@@ -326,10 +302,6 @@
 								}
 							});
 						});
-					}
-					// workaround for IE7, IE8 not rendering the final rectangle in a group
-					if(!has_canvas) {
-						$(canvas).append('<v:rect></v:rect>');
 					}
 				}
 			}).bind('mouseout.maphilight focusout.maphilight', function(e) { clear_canvas(canvas); });
