@@ -10,7 +10,7 @@ In IE VML is used. In other browsers canvas is used. Maphilight has been
 tested in Firefox, IE, Safari, Chrome, and Opera.
 
 Documentation is included in the `docs` directory, or can be found
-at https://davidlynch.org/projects/maphilight/docs/
+at https://projects.davidlynch.org/maphilight/docs/
 
 Development
 -----------
