@@ -129,6 +129,7 @@
 			if(options.stroke) {
 				context.strokeStyle = css3color(options.strokeColor, options.strokeOpacity);
 				context.lineWidth = options.strokeWidth;
+				context.setLineDash(options.strokeLineDash || []);
 				context.stroke();
 			}
 
@@ -150,6 +151,9 @@
 			for (var i in coords) { coords[i] = parseInt(coords[i], 10); }
 			fill = '<v:fill color="#'+options.fillColor+'" opacity="'+(options.fill ? options.fillOpacity : 0)+'" />';
 			stroke = (options.stroke ? 'strokeweight="'+options.strokeWidth+'" stroked="t" strokecolor="#'+options.strokeColor+'"' : 'stroked="f"');
+			// if (options.strokeLineDash) {
+			// 	stroke = stroke + ' dashstyle="' + options.strokeLineDash.join(' ') + '"'
+			// }
 			opacity = '<v:stroke opacity="'+options.strokeOpacity+'"/>';
 			if(shape == 'rect') {
 				e = $('<v:rect name="'+name+'" filled="t" '+stroke+' style="zoom:1;margin:0;padding:0;display:block;position:absolute;left:'+coords[0]+'px;top:'+coords[1]+'px;width:'+(coords[2] - coords[0])+'px;height:'+(coords[3] - coords[1])+'px;"></v:rect>');
@@ -383,6 +387,7 @@
 		strokeColor: 'ff0000',
 		strokeOpacity: 1,
 		strokeWidth: 1,
+		strokeLineDash: [],
 		fade: true,
 		alwaysOn: false,
 		alwaysOnConfig: false,

@@ -42,6 +42,7 @@
     <area id="square1" shape="poly" coords="248,126,222,150,202,122,233,105,239,118,249,125,250,128" href="#square1" alt="a square" data-maphilight='{"alwaysOn":true,"stroke":false}'>
     <area id="square2" shape="poly" coords="151,249,175,225,182,222,167,193,136,221,153,250" href="#square2" alt="another square" class="group" data-maphilight='{"groupBy":".group"}'>
     <area id="shadowed" shape="rect" coords="250,250,290,290" href="#shadowed" alt="Shadow for some" data-maphilight='{"fillColor":"00ff00","shadow":true,"shadowBackground":"ffffff","alwaysOn":true}'>
+    <area id="circle" shape="circle" coords="270,50,25" href="#circle" alt="Circles" data-maphilight='{"alwaysOn":true,"strokeColor":"ff00ff","strokeLineDash":[5,2]}'>
 </map>
 </p>
 <p>Features:</p>
@@ -50,6 +51,7 @@
         <li>The right-hand square uses a <code>data-maphilight</code> attribute to always be visible, to have no border, and to have a greenish fill; its stroke-color is overridden because it's always on</li>
         <li>The lower-left square is linked to the star using groupBy. When you mouse over it the star will hilight as well.</li>
         <li>The lower-right square has a shadow.</li>
+        <li>The circle at the top-right is always visible, and has a custom line stroke so it's dashed</li>
         <li><a id="hilightlink" href="#">Mouse over this to trigger a hilight from an external element!</a></li>
         <li><a id="starlink" href="#">Click this to toggle whether or not the star will hilight</a></li>
         <li><a id="starlink2" href="#">Click this to toggle whether or not the star is always hilighted; or click the star itself</a></li>
