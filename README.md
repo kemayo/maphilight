@@ -2,12 +2,9 @@ Maphilight
 ==========
 [![CDNJS](https://img.shields.io/cdnjs/v/maphilight.svg)](https://cdnjs.com/libraries/maphilight)
 
-Maphilight is a jQuery plugin that adds visual hilights to image maps.
+Maphilight is a jQuery plugin that adds visual hilights to image maps, by overlaying the image with a canvas element.
 
 It provides a single jQuery function: `$('.foo').maphilight()`
-
-In IE VML is used. In other browsers canvas is used. Maphilight has been
-tested in Firefox, IE, Safari, Chrome, and Opera.
 
 Documentation is included in the `docs` directory, or can be found
 at https://projects.davidlynch.org/maphilight/docs/
