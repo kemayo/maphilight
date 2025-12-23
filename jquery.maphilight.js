@@ -20,8 +20,9 @@
 		return 'rgba('+hex_to_decimal(color.substr(0,2))+','+hex_to_decimal(color.substr(2,2))+','+hex_to_decimal(color.substr(4,2))+','+opacity+')';
 	};
 	create_canvas_for = function(img) {
-		var c = $('<canvas style="width:'+$(img).width()+'px;height:'+$(img).height()+'px;"></canvas>').get(0);
-		c.getContext("2d").clearRect(0, 0, $(img).width(), $(img).height());
+		var $img = $(img);
+		var c = $('<canvas style="width:'+$img.width()+'px;height:'+$img.height()+'px;"></canvas>').get(0);
+		c.getContext("2d").clearRect(0, 0, $img.width(), $img.height());
 		return c;
 	};
 	var draw_shape = function(context, shape, coords, x_shift, y_shift) {
@@ -167,34 +168,33 @@
 		border: 0
 	};
 
-	var ie_hax_done = false;
 	$.fn.maphilight = function(opts) {
 		opts = $.extend({}, $.fn.maphilight.defaults, opts);
 
 		return this.each(function() {
-			var img, wrap, options, map, canvas, canvas_always, highlighted_shape, usemap, imgSrc;
-			img = $(this);
+			var $img, $wrap, options, $map, canvas, canvas_always, highlighted_shape, usemap, imgSrc;
+			$img = $(this);
 
 			if(!is_image_loaded(this)) {
 				// If the image isn't fully loaded, this won't work right.  Try again later.
 				return window.setTimeout(function() {
-					img.maphilight(opts);
+					$img.maphilight(opts);
 				}, 200);
 			}
 
-			options = $.extend({}, opts, $.metadata ? img.metadata() : false, img.data('maphilight'));
+			options = $.extend({}, opts, $.metadata ? $img.metadata() : false, $img.data('maphilight'));
 
 			// jQuery bug with Opera, results in full-url#usemap being returned from jQuery's attr.
 			// So use raw getAttribute instead.
-			usemap = img.get(0).getAttribute('usemap');
+			usemap = $img.get(0).getAttribute('usemap');
 
 			if (!usemap) {
 				return;
 			}
 
-			map = $('map[name="'+usemap.substr(1)+'"]');
+			$map = $('map[name="'+usemap.substr(1)+'"]');
 
-			if(!(img.is('img,input[type="image"]') && usemap && map.length > 0)) {
+			if(!($img.is('img,input[type="image"]') && usemap && $map.length > 0)) {
 				return;
 			}
 
@@ -202,21 +202,21 @@
 			// be affected by it being wrapped by the div below. (e.g. width:50%)
 			// For now, we'll trust that something else is handling scaling the <area>'s coords to account
 			// for this non-static sizing...
-			var currentWidth = img.width();
-			var currentHeight = img.height();
-			
-			if(img.hasClass('maphilighted')) {
+			var currentWidth = $img.width();
+			var currentHeight = $img.height();
+
+			if($img.hasClass('maphilighted')) {
 				// We're redrawing an old map, probably to pick up changes to the options.
 				// Just clear out all the old stuff.
-				var wrapper = img.parent();
-				img.insertBefore(wrapper);
-				wrapper.remove();
-				$(map).unbind('.maphilight');
+				var $wrapper = $img.parent();
+				$img.insertBefore($wrapper);
+				$wrapper.remove();
+				$map.unbind('.maphilight');
 			}
 
 			//Formating the image source. IE > 9 has issue with new line characters
 			imgSrc = this.src.replace(/[\n\r]/g, '');
-			wrap = $('<div></div>').css({
+			$wrap = $('<div></div>').css({
 				display:'block',
 				background:'url("'+this.src+'")',
 				"background-size":'contain',
@@ -228,37 +228,37 @@
 				});
 			if(options.wrapClass) {
 				if(options.wrapClass === true) {
-					wrap.addClass($(this).attr('class'));
+					$wrap.addClass($(this).attr('class'));
 				} else {
-					wrap.addClass(options.wrapClass);
+					$wrap.addClass(options.wrapClass);
 				}
 			}
 			// Firefox has a bug that prevents tabbing into the image map if
 			// we set opacity of the image to 0, but very nearly 0 works!
-			img.before(wrap).css('opacity', 0.0000000001).css(canvas_style).remove();
-			wrap.append(img);
+			$img.before($wrap).css('opacity', 0.0000000001).css(canvas_style).remove();
+			$wrap.append($img);
 
 			canvas = create_canvas_for(this);
 			$(canvas).css(canvas_style);
 			canvas.height = currentHeight;
 			canvas.width = currentWidth;
 
-			$(map).bind('alwaysOn.maphilight', function() {
+			$map.bind('alwaysOn.maphilight', function() {
 				// Check for areas with alwaysOn set. These are added to a *second* canvas,
 				// which will get around flickering during fading.
 				if(canvas_always) {
 					clear_canvas(canvas_always);
 				}
-				$(map).find('area[coords]').each(function() {
+				$map.find('area[coords]').each(function() {
 					var shape, area_options;
 					area_options = options_from_area(this, options);
 					if(area_options.alwaysOn) {
 						if(!canvas_always) {
-							canvas_always = create_canvas_for(img[0]);
+							canvas_always = create_canvas_for($img[0]);
 							$(canvas_always).css(canvas_style);
 							canvas_always.width = currentWidth;
 							canvas_always.height = currentHeight;
-							img.before(canvas_always);
+							$img.before(canvas_always);
 						}
 						area_options.fade = area_options.alwaysOnFade; // alwaysOn shouldn't fade in initially
 						shape = shape_from_area(this);
@@ -287,9 +287,9 @@
 							var areas;
 							// two ways groupBy might work; attribute and selector
 							if(/^[a-zA-Z][\-a-zA-Z]+$/.test(groupitem)) {
-								areas = map.find('area['+groupitem+'="'+el.attr(groupitem)+'"]');
+								areas = $map.find('area['+groupitem+'="'+el.attr(groupitem)+'"]');
 							} else {
-								areas = map.find(groupitem);
+								areas = $map.find(groupitem);
 							}
 							var first = this;
 							areas.each(function() {
@@ -306,9 +306,9 @@
 				}
 			}).bind('mouseout.maphilight focusout.maphilight', function(e) { clear_canvas(canvas); });
 
-			img.before(canvas); // if we put this after, the mouseover events wouldn't fire.
+			$img.before(canvas); // if we put this after, the mouseover events wouldn't fire.
 
-			img.addClass('maphilighted');
+			$img.addClass('maphilighted');
 		});
 	};
 	$.fn.maphilight.defaults = {
